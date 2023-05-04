@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = output/imgui.o output/exceptio.o output/genlib.o output/graphics.o output/linkedlist.o output/random.o output/simpio.o output/strlib.o output/randMaze.o output/initialgame.o
-LINKOBJ  = output/imgui.o output/exceptio.o output/genlib.o output/graphics.o output/linkedlist.o output/random.o output/simpio.o output/strlib.o output/randMaze.o output/initialgame.o
+OBJ      = output/imgui.o output/exceptio.o output/genlib.o output/graphics.o output/linkedlist.o output/random.o output/simpio.o output/strlib.o output/Randomize.o output/initialgame.o
+LINKOBJ  = output/imgui.o output/exceptio.o output/genlib.o output/graphics.o output/linkedlist.o output/random.o output/simpio.o output/strlib.o output/Randomize.o output/initialgame.o
 LIBS     = -L"D:/c”Ô—‘/Dev-Cpp/MinGW64/lib" -L"D:/c”Ô—‘/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -mwindows -g3
 INCS     = -I"D:/c”Ô—‘/Dev-Cpp/MinGW64/include" -I"D:/c”Ô—‘/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"D:/c”Ô—‘/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"libgraphics" -I"simpleGUI"
 CXXINCS  = -I"D:/c”Ô—‘/Dev-Cpp/MinGW64/include" -I"D:/c”Ô—‘/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"D:/c”Ô—‘/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"D:/c”Ô—‘/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++" -I"libgraphics" -I"simpleGUI"
@@ -48,8 +48,8 @@ output/simpio.o: libgraphics/simpio.c
 output/strlib.o: libgraphics/strlib.c
 	$(CC) -c libgraphics/strlib.c -o output/strlib.o $(CFLAGS)
 
-output/randMaze.o: randMaze.c
-	$(CC) -c randMaze.c -o output/randMaze.o $(CFLAGS)
+output/Randomize.o: Randomize.c
+	$(CC) -c Randomize.c -o output/Randomize.o $(CFLAGS)
 
 output/initialgame.o: initialgame.c
 	$(CC) -c initialgame.c -o output/initialgame.o $(CFLAGS)

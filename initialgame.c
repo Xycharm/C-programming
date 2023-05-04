@@ -22,7 +22,7 @@
 
 #include"Block.h"
 
-int blockState[N]={1,0,0,1};
+int blockState[N]={1,0,0,1};;
 //char *colors[]={"Red","Black","Light Gray"};
 
 void colorBlock(int color,int coordinate);
@@ -33,6 +33,7 @@ void colorBlock(int color,int coordinate);
 
 void InitGame(){
 	Randomize();//Randomize Initialization
+	randMaze();
 }
 
 void Display(){
@@ -54,7 +55,7 @@ void Main()
     Display();
 }
 
-void Barrier(){//bound
+void Barrier(){
 		
 	double windowWidth = GetWindowWidth();
 	double windowHeight = GetWindowHeight();
@@ -81,7 +82,7 @@ void colorBlock(int color,int coordinate){
 	double py=(coordinate/X)*blockL;
 	MovePen(px, py);
 	if(blockState[coordinate]==BARRIER){
-		   SetPenColor("Black");
+		SetPenColor("Black");
 	}else if(blockState[coordinate]==RED){
 		SetPenColor("Red");
 	}
