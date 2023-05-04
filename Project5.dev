@@ -1,10 +1,10 @@
 [Project]
-FileName=CAD.dev
-Name=CAD
+FileName=Project5.dev
+Name=Project5
 Type=0
 Ver=2
 ObjFiles=
-Includes=libgraphics
+Includes=libgraphics;simpleGUI
 Libs=
 PrivateResource=
 ResourceIncludes=
@@ -19,17 +19,17 @@ ObjectOutput=output
 LogOutput=
 LogOutputEnabled=0
 OverrideOutput=0
-OverrideOutputName=CAD.exe
+OverrideOutputName=Project5.exe
 HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
 CommandLine=
-Folders=libgraphics
+Folders=GUI,libgraphics
 IncludeVersionInfo=0
 SupportXPThemes=0
-CompilerSet=1
+CompilerSet=0
 CompilerSettings=0000000000000000001000000
-UnitCount=18
+UnitCount=22
 
 [VersionInfo]
 Major=1
@@ -50,7 +50,47 @@ ProductVersion=1.0.0.0
 AutoIncBuildNr=0
 SyncProduct=1
 
+[Unit20]
+FileName=randMaze.c
+CompileCpp=0
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit22]
+FileName=block.h
+CompileCpp=0
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
 [Unit1]
+FileName=simpleGUI\imgui.c
+CompileCpp=0
+Folder=GUI
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit2]
+FileName=simpleGUI\imgui.h
+CompileCpp=0
+Folder=GUI
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit3]
 FileName=libgraphics\boolean.h
 CompileCpp=0
 Folder=libgraphics
@@ -60,7 +100,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit2]
+[Unit4]
 FileName=libgraphics\exceptio.c
 CompileCpp=0
 Folder=libgraphics
@@ -70,7 +110,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit3]
+[Unit5]
 FileName=libgraphics\exception.h
 CompileCpp=0
 Folder=libgraphics
@@ -80,7 +120,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit4]
+[Unit6]
 FileName=libgraphics\extgraph.h
 CompileCpp=0
 Folder=libgraphics
@@ -90,7 +130,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit5]
+[Unit7]
 FileName=libgraphics\gcalloc.h
 CompileCpp=0
 Folder=libgraphics
@@ -100,7 +140,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit6]
+[Unit8]
 FileName=libgraphics\genlib.c
 CompileCpp=0
 Folder=libgraphics
@@ -110,7 +150,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit7]
+[Unit9]
 FileName=libgraphics\genlib.h
 CompileCpp=0
 Folder=libgraphics
@@ -120,7 +160,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit8]
+[Unit10]
 FileName=libgraphics\graphics.c
 CompileCpp=0
 Folder=libgraphics
@@ -130,7 +170,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit9]
+[Unit11]
 FileName=libgraphics\graphics.h
 CompileCpp=0
 Folder=libgraphics
@@ -140,7 +180,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit10]
+[Unit12]
 FileName=libgraphics\linkedlist.c
 CompileCpp=0
 Folder=libgraphics
@@ -150,7 +190,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit11]
+[Unit13]
 FileName=libgraphics\linkedlist.h
 CompileCpp=0
 Folder=libgraphics
@@ -160,7 +200,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit12]
+[Unit14]
 FileName=libgraphics\random.c
 CompileCpp=0
 Folder=libgraphics
@@ -170,7 +210,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit13]
+[Unit15]
 FileName=libgraphics\random.h
 CompileCpp=0
 Folder=libgraphics
@@ -180,7 +220,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit14]
+[Unit16]
 FileName=libgraphics\simpio.c
 CompileCpp=0
 Folder=libgraphics
@@ -190,7 +230,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit15]
+[Unit17]
 FileName=libgraphics\simpio.h
 CompileCpp=0
 Folder=libgraphics
@@ -200,7 +240,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit16]
+[Unit18]
 FileName=libgraphics\strlib.c
 CompileCpp=0
 Folder=libgraphics
@@ -210,7 +250,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit17]
+[Unit19]
 FileName=libgraphics\strlib.h
 CompileCpp=0
 Folder=libgraphics
@@ -220,8 +260,8 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit18]
-FileName=CAD.c
+[Unit21]
+FileName=initialgame.c
 CompileCpp=0
 Folder=
 Compile=1

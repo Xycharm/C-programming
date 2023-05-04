@@ -20,23 +20,21 @@
 
 #include "linkedlist.h"
 
-//#include"Block.h"
-#define X 10
-#define N (X*X)
-#define VACANT 0
-#define BARRIER	1 
-#define	RED 2
-void colorBlock(int color,int coordinate);
+#include"Block.h"
+
 int blockState[N]={1,0,0,1};
 //char *colors[]={"Red","Black","Light Gray"};
+
+void colorBlock(int color,int coordinate);
+
+
 
 
 
 void InitGame(){
 	Randomize();//Randomize Initialization
-	//	randMaze();
-	
 }
+
 void Display(){
 	DisplayClear();
 	int i=0;
@@ -56,7 +54,7 @@ void Main()
     Display();
 }
 
-void Barrier(){
+void Barrier(){//bound
 		
 	double windowWidth = GetWindowWidth();
 	double windowHeight = GetWindowHeight();
@@ -97,4 +95,3 @@ void colorBlock(int color,int coordinate){
 
 	
 }
-
