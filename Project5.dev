@@ -51,17 +51,7 @@ AutoIncBuildNr=0
 SyncProduct=1
 
 [Unit20]
-FileName=randMaze.c
-CompileCpp=0
-Folder=
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit22]
-FileName=block.h
+FileName=initialgame.c
 CompileCpp=0
 Folder=
 Compile=1
@@ -261,7 +251,17 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit21]
-FileName=initialgame.c
+FileName=block.h
+CompileCpp=0
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit22]
+FileName=Randomize.c
 CompileCpp=0
 Folder=
 Compile=1
