@@ -116,6 +116,7 @@ void MouseEventProcess(int x, int y, int button, int event){
 
 
 void KeyboardEventProcess(int key,int event){//Keyboard
+    int i;
 	switch(event){
 		case KEY_DOWN:
 			switch(key){
@@ -129,6 +130,12 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					break;
 				case VK_F2:
 					randMaze();
+					Display();
+					break;
+				case VK_F3:
+					for(i = 0;i < N;i++){
+						blockState[i] = VACANT;
+					}
 					Display();
 			}
 			break;
