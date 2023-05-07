@@ -27,8 +27,9 @@
 #define BARRIER    1
 #define    RED 2
 #define DEST 3
-#define FILLRATIO 25 //filling ratio of blocks is 35% 
+#define FILLRATIO 0.25 //filling ratio of blocks is 0.25 
 
+int lock = 1;
 int blockState[N];
 //record the state of blocks{VACANT,BARRIER,RED(visualizing route),DEST(start/end)}
 char *colors[]={0,"Black","Red","Yellow"};//store the color strings
@@ -82,12 +83,50 @@ void colorBlock(int color, int coordinate) { //Draw the color blocks
 
 
 }
+
+void MouseEventProcess(int x, int y, int button, int event){
+	if(lock == 1) return;
+	double windowWidth = GetWindowWidth();
+    double windowHeight = GetWindowHeight();
+    double blockL = windowWidth / X;
+	
+    uiGetMouse(x,y,button,event); 
+	if (button == LEFT_BUTTON && event == BUTTON_DOWN ) {
+	
+		int i;
+		int curCoordinate = -1;
+		double xx = ScaleXInches(x);
+		double yy = ScaleYInches(y);
+		for(i=0;i<N;i++){
+			double px = (i % X) * blockL;
+            double py = (i / X) * blockL;
+			if(xx > px && xx < px + blockL && yy > py && yy < py + blockL){
+				curCoordinate = i;
+				break;
+			}
+		}
+		if (curCoordinate < N  && curCoordinate >= 0 && blockState[curCoordinate] == VACANT) {
+		 	blockState[curCoordinate] = BARRIER;
+		}else if(curCoordinate < N && curCoordinate >= 0 && blockState[curCoordinate] == BARRIER){
+		 	blockState[curCoordinate] = VACANT;
+		}
+	}
+	Display();
+}	
+
+
 void KeyboardEventProcess(int key,int event){//Keyboard
 	switch(event){
 		case KEY_DOWN:
 			switch(key){
 				case VK_F1:
-					//write your code here
+					if(lock == 1){
+						lock = 0;
+						registerMouseEvent(MouseEventProcess);
+					}else{
+						lock = 1;
+					}
+					break;
 				case VK_F2:
 					randMaze();
 					Display();
@@ -97,8 +136,6 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 			break;
 	
 	}
-
-
 }
 
 
@@ -123,7 +160,7 @@ void randMaze() {
         if (blockState[i] == VACANT) {
             blockState[i] = DEST;
         }
-    for (k = 0; k < FILLRATIO*N/100; k++) {
+    for (k = 0; k < FILLRATIO*N; k++) {
 
         while (1) {
             i = rand() % N;
