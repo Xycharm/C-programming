@@ -21,21 +21,44 @@
 #include "linkedlist.h"
 
 #include "random.h"
-#define X 75
+#define X 13
 #define N (X*X)
-#define VACANT 0
-#define BARRIER    1
-#define    RED 2
-#define DEST 3
-#define FILLRATIO 0.25 //filling ratio of blocks is 0.25 
+#define  VACANT  0
+#define BARRIER  1
+#define     RED  2
+#define    DEST  3
+#define   START  4
+#define FILLRATIO 0.2
+
+void explore(int path[N], int ci, int length);
 
 int lock = 1;
+int start,dest;
 int blockState[N];
-//record the state of blocks{VACANT,BARRIER,RED(visualizing route),DEST(start/end)}
-char *colors[]={0,"Black","Red","Yellow"};//store the color strings
+//record the state of blocks{VACANT,BARRIER,RED(visualizing route),DEST,START}
+
+int paths[500][N];//record the steps
+int lengths[N];//the length of each path
+int soFar, count;
+int shown_count;
+
+char *colors[]={0,"Black","Red","Yellow","Green"};//store the color strings
+
 void InitGame() {
     Randomize();//Randomize Initialization
-    randMaze();//Randomize the Maze
+    do{
+    	randMaze();//Randomize the Maze
+        int path[N];
+        int i;
+        for(i = 0;i < N;i++){
+        	path[i] = blockState[i];
+	    } 
+	    soFar = 99999999;
+	    count = 0;
+        explore(path, start, 0);
+	}while(count == 0);//make sure that there's at least one path
+	shown_count == 0;
+    InitConsole();
 }
 void Display() {//(re)display the changes
     DisplayClear();
@@ -46,13 +69,12 @@ void Display() {//(re)display the changes
     }
 }
 
-
-
 void Barrier() {//Draw the grids
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight();
     double blockL = windowWidth / X;
     int j = 0;
+    SetPenColor("Black");
     for (j = 0; j < X; j++) {
         MovePen(j * blockL, 0);
         DrawLine(0, windowHeight);
@@ -64,7 +86,7 @@ void Barrier() {//Draw the grids
 }
 
 void colorBlock(int color, int coordinate) { //Draw the color blocks
-    if (blockState[coordinate] == VACANT)return;
+    if (color == VACANT)return;
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight();
     double blockL = windowWidth / X;
@@ -72,7 +94,7 @@ void colorBlock(int color, int coordinate) { //Draw the color blocks
     double px = (coordinate % X) * blockL;
     double py = (coordinate / X) * blockL;
     MovePen(px, py);
-    SetPenColor(colors[blockState[coordinate]]);
+    SetPenColor(colors[color]);
     StartFilledRegion(1);
     DrawLine(0, blockL);
     DrawLine(blockL, 0);
@@ -129,7 +151,7 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					}
 					break;
 				case VK_F2:
-					randMaze();
+					InitGame();
 					Display();
 					break;
 				case VK_F3:
@@ -137,6 +159,23 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 						blockState[i] = VACANT;
 					}
 					Display();
+					break;
+				case VK_F4:
+					Display();
+					if(shown_count >= count){
+						shown_count = 0; 
+					}
+					while(shown_count < count && lengths[shown_count] > soFar)
+						    shown_count++;
+					
+					printf("%d/%d\n", shown_count, count);
+					int j;
+					for(j = 0;j < soFar;j++){
+						printf("%d->",paths[shown_count][j]);
+						colorBlock(RED, paths[shown_count][j]);
+					}
+					printf("\n");
+					shown_count++;
 			}
 			break;
 		case KEY_UP:
@@ -154,18 +193,42 @@ void Main() {
     Display();
     registerKeyboardEvent(KeyboardEventProcess);
 }
+
+void outerWall(){
+	int i,j;
+	for(i = 0;i < X;i++){
+		blockState[i] = BARRIER;
+	}
+	for(j = 0;j <= X;j++){
+		blockState[i+j*X] = BARRIER;
+	}
+	for(j = X-1;i >= 0;i--){
+		blockState[i+j*X] = BARRIER;
+	}
+	for(i;j >= 0;j--){
+		blockState[i+j*X] = BARRIER;
+	}
+}
+
 void randMaze() {
     int i, k;
     for (i=0;i<N;i++){
     	blockState[i]=0;
 	}
-	        i = rand() % N;
-        if (blockState[i] == VACANT) {
-            blockState[i] = DEST;
+	outerWall();
+	while (1) {
+            dest = rand() % N;
+            if (blockState[dest] == VACANT) {
+                blockState[dest] = DEST;
+                break;
+            }
         }
-        	        i = rand() % N;
-        if (blockState[i] == VACANT) {
-            blockState[i] = DEST;
+	    while (1) {
+            start = rand() % N;
+            if (blockState[start] == VACANT) {
+                blockState[start] = START;
+                break;
+            }
         }
     for (k = 0; k < FILLRATIO*N; k++) {
 
@@ -178,3 +241,31 @@ void randMaze() {
         }
     }
 }
+void explore(int path[N], int ci, int length){
+	if(ci == dest && soFar >= length){
+		int i, j = 0;
+		for(i = 0;i < N;i++){
+			if(path[i] == RED){
+				paths[count][j] = i;
+				j++;
+			}
+		}
+		lengths[count] = length;
+		soFar = (length < soFar ? length : soFar);
+		count++;
+	}else{
+		int j;
+	    int delta[4] = {1, X, -1, -X};
+	    for(j = 0;j < 4;j++){
+	    	int ni = ci + delta[j];
+	    	if(path[ni] == VACANT || path[ni] == DEST){
+	    		path[ni] = RED;
+	    		explore(path, ni, length + 1);
+				path[ni] = VACANT;
+			}
+		}
+	}
+}
+
+
+
