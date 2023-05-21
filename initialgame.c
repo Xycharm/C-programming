@@ -21,14 +21,14 @@
 #include "linkedlist.h"
 
 #include "random.h"
-#define X 13
+#define X 30
 #define N (X*X)
 #define  VACANT  0
 #define BARRIER  1
 #define     RED  2
 #define    DEST  3
 #define   START  4
-#define FILLRATIO 0.2
+#define FILLRATIO 0.35
 
 void explore(int path[N], int ci, int length);
 
@@ -59,6 +59,7 @@ void InitGame() {
 	}while(count == 0);//make sure that there's at least one path
 	shown_count == 0;
     InitConsole();
+    printf("yes\n");
 }
 void Display() {//(re)display the changes
     DisplayClear();
@@ -242,6 +243,7 @@ void randMaze() {
     }
 }
 void explore(int path[N], int ci, int length){
+	if(length > soFar)return;
 	if(ci == dest && soFar >= length){
 		int i, j = 0;
 		for(i = 0;i < N;i++){
