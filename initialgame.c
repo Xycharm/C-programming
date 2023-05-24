@@ -20,53 +20,149 @@
 
 #include "linkedlist.h"
 
-#include "random.h"
-#define X 30
-#define N (X*X)
+#include "random.h"0
+#define X 51
+//must be odd
 #define  VACANT  0
 #define BARRIER  1
 #define     RED  2
 #define    DEST  3
 #define   START  4
-#define FILLRATIO 0.35
 
-void explore(int path[N], int ci, int length);
 
-int lock = 1;
-int start,dest;
-int blockState[N];
-//record the state of blocks{VACANT,BARRIER,RED(visualizing route),DEST,START}
-
-int paths[500][N];//record the steps
-int lengths[N];//the length of each path
-int soFar, count;
-int shown_count;
-
+int blockState[X][X];//TO DO:change into a structure array
+int lock;
 char *colors[]={0,"Black","Red","Yellow","Green"};//store the color strings
+int check(int i,int j){//return 0 if cant else 1
+    if(i<0||i>=X||j<0||j>=X)return 0;
+    if(blockState[i][j]==VACANT)return 0;
+    return 1;
+}
+int direction_feasible(int i, int j){
+
+
+
+    int k=0;
+    for(k=0;k<4;k++){
+        
+        switch (k) {
+            case 0:
+                if(check(i,j+2)==1)return 0;
+                break;
+            case 1:
+                if(check(i+2,j)==1)return 1;
+                break;
+            case 2:
+                if(check(i,j-2)==1)return 2;
+                break;
+            case 3:
+                if(check(i-2,j)==1)return 3;
+                break;
+        }
+
+    }
+
+
+
+    return -1;
+    //return -1 /*reversed 0up 1right 2down 3left
+}
+int direction_judge(int i, int j,int dir){
+
+        switch (dir) {
+            case 0:
+                if(check(i,j+2)==1)return 1;
+                break;
+            case 1:
+                if(check(i+2,j)==1)return 1;
+                break;
+            case 2:
+                if(check(i,j-2)==1)return 1;
+                break;
+            case 3:
+                if(check(i-2,j)==1)return 1;
+                break;
+        }
+
+
+
+
+    return -1;
+    //return -1 /*reversed 0up 1right 2down 3left
+}
+
+void randomDFS(int i,int j){
+    if (direction_feasible(i,j)==-1) return;
+    int rand_way=rand()%4;
+    int k;
+	for(k=0;k<4;k++) {
+        if(direction_judge(i,j,(k+rand_way)%4)==1){
+            switch ((k+rand_way)%4) {
+                case 0:
+                    if (blockState[i][j + 1] == BARRIER) {
+                        blockState[i][j + 1] = VACANT;
+                    }
+                    if (blockState[i][j + 2] == BARRIER) {
+                        blockState[i][j + 2] = VACANT;
+                    }
+                    randomDFS(i, j + 2);
+                    break;
+                case 1:
+                    if (blockState[i + 1][j] == BARRIER) {
+                        blockState[i + 1][j] = VACANT;
+                    }
+                    if (blockState[i + 2][j] == BARRIER) {
+                        blockState[i + 2][j] = VACANT;
+                    }
+                    randomDFS(i + 2, j);
+                    break;
+                case 2:
+                    if (blockState[i][j - 1] == BARRIER) {
+                        blockState[i][j - 1] = VACANT;
+                    }
+                    if (blockState[i][j - 2] == BARRIER) {
+                        blockState[i][j - 2] = VACANT;
+                    }
+                    randomDFS(i, j - 2);
+                    break;
+                case 3:
+                    if (blockState[i - 1][j] == BARRIER) {
+                        blockState[i - 1][j] = VACANT;
+                    }
+                    if (blockState[i - 2][j] == BARRIER) {
+                        blockState[i - 2][j] = VACANT;
+                    }
+                    randomDFS(i - 2, j);
+                    break;
+
+
+            }
+        }
+
+    }
+}
+
 
 void InitGame() {
-    Randomize();//Randomize Initialization
-    do{
-    	randMaze();//Randomize the Maze
-        int path[N];
-        int i;
-        for(i = 0;i < N;i++){
-        	path[i] = blockState[i];
-	    } 
-	    soFar = 99999999;
-	    count = 0;
-        explore(path, start, 0);
-	}while(count == 0);//make sure that there's at least one path
-	shown_count == 0;
-    InitConsole();
-    printf("yes\n");
+	srand( (unsigned)time( NULL ) );
+	int i,j;
+	for(i=0;i<X;i++){
+		for(j=0;j<X;j++){
+			blockState[i][j]=BARRIER;
+		}
+	}
+	blockState[1][1]=START;
+	blockState[X-2][X-2]=DEST;
+	randomDFS(1,1);
 }
 void Display() {//(re)display the changes
     DisplayClear();
-    int i = 0;
+    int i = 0,j = 0;
     Barrier();
-    for (i = 0; i < N; i++) {
-        colorBlock(blockState[i], i);
+    for (i = 0; i < X; i++) {
+		for(j=0;j<X;j++ ){
+			colorBlock(blockState[i][j],i,j);
+		}
     }
 }
 
@@ -86,15 +182,15 @@ void Barrier() {//Draw the grids
     }
 }
 
-void colorBlock(int color, int coordinate) { //Draw the color blocks
+void colorBlock(int color, int x,int y) { //Draw the color blocks
     if (color == VACANT)return;
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight();
     double blockL = windowWidth / X;
 
-    double px = (coordinate % X) * blockL;
-    double py = (coordinate / X) * blockL;
-    MovePen(px, py);
+    double px = x * blockL;
+    double py = y * blockL;
+    MovePen(py, px);
     SetPenColor(colors[color]);
     StartFilledRegion(1);
     DrawLine(0, blockL);
@@ -107,76 +203,25 @@ void colorBlock(int color, int coordinate) { //Draw the color blocks
 
 }
 
-void MouseEventProcess(int x, int y, int button, int event){
-	if(lock == 1) return;
-	double windowWidth = GetWindowWidth();
-    double windowHeight = GetWindowHeight();
-    double blockL = windowWidth / X;
-	
-    uiGetMouse(x,y,button,event); 
-	if (button == LEFT_BUTTON && event == BUTTON_DOWN ) {
-	
-		int i;
-		int curCoordinate = -1;
-		double xx = ScaleXInches(x);
-		double yy = ScaleYInches(y);
-		for(i=0;i<N;i++){
-			double px = (i % X) * blockL;
-            double py = (i / X) * blockL;
-			if(xx > px && xx < px + blockL && yy > py && yy < py + blockL){
-				curCoordinate = i;
-				break;
-			}
-		}
-		if (curCoordinate < N  && curCoordinate >= 0 && blockState[curCoordinate] == VACANT) {
-		 	blockState[curCoordinate] = BARRIER;
-		}else if(curCoordinate < N && curCoordinate >= 0 && blockState[curCoordinate] == BARRIER){
-		 	blockState[curCoordinate] = VACANT;
-		}
-	}
-	Display();
-}	
-
-
 void KeyboardEventProcess(int key,int event){//Keyboard
     int i;
 	switch(event){
 		case KEY_DOWN:
 			switch(key){
 				case VK_F1:
-					if(lock == 1){
-						lock = 0;
-						registerMouseEvent(MouseEventProcess);
-					}else{
-						lock = 1;
-					}
-					break;
+//					if(lock == 1){
+//						lock = 0;
+//						registerMouseEvent(MouseEventProcess);
+//					}else{
+//						lock = 1;
+//					}
+//					break;
 				case VK_F2:
 					InitGame();
 					Display();
 					break;
-				case VK_F3:
-					for(i = 0;i < N;i++){
-						blockState[i] = VACANT;
-					}
-					Display();
-					break;
 				case VK_F4:
-					Display();
-					if(shown_count >= count){
-						shown_count = 0; 
-					}
-					while(shown_count < count && lengths[shown_count] > soFar)
-						    shown_count++;
-					
-					printf("%d/%d\n", shown_count, count);
-					int j;
-					for(j = 0;j < soFar;j++){
-						printf("%d->",paths[shown_count][j]);
-						colorBlock(RED, paths[shown_count][j]);
-					}
-					printf("\n");
-					shown_count++;
+					break;
 			}
 			break;
 		case KEY_UP:
@@ -185,89 +230,49 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 	}
 }
 
+//void MouseEventProcess(int x, int y, int button, int event){
+//	if(lock == 1) return;
+//	double windowWidth = GetWindowWidth();
+//    double windowHeight = GetWindowHeight();
+//    double blockL = windowWidth / X;
+//	
+//    uiGetMouse(x,y,button,event); 
+//	if (button == LEFT_BUTTON && event == BUTTON_DOWN ) {
+//	
+//		int i;
+//		int curCoordinate = -1;
+//		double xx = ScaleXInches(x);
+//		double yy = ScaleYInches(y);
+//		for(i=0;i<N;i++){
+//			double px = (i % X) * blockL;
+//            double py = (i / X) * blockL;
+//			if(xx > px && xx < px + blockL && yy > py && yy < py + blockL){
+//				curCoordinate = i;
+//				break;
+//			}
+//		}
+//		if (curCoordinate < N  && curCoordinate >= 0 && blockState[curCoordinate] == VACANT) {
+//		 	blockState[curCoordinate] = BARRIER;
+//		}else if(curCoordinate < N && curCoordinate >= 0 && blockState[curCoordinate] == BARRIER){
+//		 	blockState[curCoordinate] = VACANT;
+//		}
+//	}
+//	Display();
+//}	
 
 void Main() {
+	
     SetWindowTitle("Maze");
     SetWindowSize(X, X);
     InitGraphics();
     InitGame();
-    Display();
     registerKeyboardEvent(KeyboardEventProcess);
+    Display();
+    
 }
 
-void outerWall(){
-	int i,j;
-	for(i = 0;i < X;i++){
-		blockState[i] = BARRIER;
-	}
-	for(j = 0;j <= X;j++){
-		blockState[i+j*X] = BARRIER;
-	}
-	for(j = X-1;i >= 0;i--){
-		blockState[i+j*X] = BARRIER;
-	}
-	for(i;j >= 0;j--){
-		blockState[i+j*X] = BARRIER;
-	}
-}
 
-void randMaze() {
-    int i, k;
-    for (i=0;i<N;i++){
-    	blockState[i]=0;
-	}
-	outerWall();
-	while (1) {
-            dest = rand() % N;
-            if (blockState[dest] == VACANT) {
-                blockState[dest] = DEST;
-                break;
-            }
-        }
-	    while (1) {
-            start = rand() % N;
-            if (blockState[start] == VACANT) {
-                blockState[start] = START;
-                break;
-            }
-        }
-    for (k = 0; k < FILLRATIO*N; k++) {
 
-        while (1) {
-            i = rand() % N;
-            if (blockState[i] == VACANT) {
-                blockState[i] = BARRIER;
-                break;
-            }
-        }
-    }
-}
-void explore(int path[N], int ci, int length){
-	if(length > soFar)return;
-	if(ci == dest && soFar >= length){
-		int i, j = 0;
-		for(i = 0;i < N;i++){
-			if(path[i] == RED){
-				paths[count][j] = i;
-				j++;
-			}
-		}
-		lengths[count] = length;
-		soFar = (length < soFar ? length : soFar);
-		count++;
-	}else{
-		int j;
-	    int delta[4] = {1, X, -1, -X};
-	    for(j = 0;j < 4;j++){
-	    	int ni = ci + delta[j];
-	    	if(path[ni] == VACANT || path[ni] == DEST){
-	    		path[ni] = RED;
-	    		explore(path, ni, length + 1);
-				path[ni] = VACANT;
-			}
-		}
-	}
-}
 
 
 
