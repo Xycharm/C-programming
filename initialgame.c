@@ -31,12 +31,17 @@
 
 
 int blockState[X][X];//TO DO:change into a structure array
-int lock;
+struct{
+	int i;
+	int j;
+}agent={1,1};
+int lock_change=1;
 char *colors[]={0,"Black","Red","Yellow","Green"};//store the color strings
 int check(int i,int j){//return 0 if cant else 1
     if(i<0||i>=X||j<0||j>=X)return 0;
     if(blockState[i][j]==VACANT)return 0;
-    return 1;
+    if(blockState[i][j]==BARRIER)return 1;
+    return -1;
 }
 int direction_feasible(int i, int j){
 
@@ -47,16 +52,16 @@ int direction_feasible(int i, int j){
         
         switch (k) {
             case 0:
-                if(check(i,j+2)==1)return 0;
+                if(check(i,j+2)!=0)return 0;
                 break;
             case 1:
-                if(check(i+2,j)==1)return 1;
+                if(check(i+2,j)!=0)return 1;
                 break;
             case 2:
-                if(check(i,j-2)==1)return 2;
+                if(check(i,j-2)!=0)return 2;
                 break;
             case 3:
-                if(check(i-2,j)==1)return 3;
+                if(check(i-2,j)!=0)return 3;
                 break;
         }
 
@@ -71,16 +76,16 @@ int direction_judge(int i, int j,int dir){
 
         switch (dir) {
             case 0:
-                if(check(i,j+2)==1)return 1;
+                if(check(i,j+2)!=0)return 1;
                 break;
             case 1:
-                if(check(i+2,j)==1)return 1;
+                if(check(i+2,j)!=0)return 1;
                 break;
             case 2:
-                if(check(i,j-2)==1)return 1;
+                if(check(i,j-2)!=0)return 1;
                 break;
             case 3:
-                if(check(i-2,j)==1)return 1;
+                if(check(i-2,j)!=0)return 1;
                 break;
         }
 
@@ -142,7 +147,24 @@ void randomDFS(int i,int j){
     }
 }
 
-
+void ClearMaze(){
+	int i,j;
+	for(i=0;i<X;i++){
+		for(j=0;j<X;j++){
+			blockState[i][j]=VACANT;
+		}
+	}
+	blockState[1][1]=START;
+	blockState[X-2][X-2]=DEST;
+		for(i=0;i<X;i++){
+		blockState[i][0]=BARRIER;
+		blockState[i][X-1]=BARRIER;
+		blockState[0][i]=BARRIER;
+		blockState[X-1][i]=BARRIER;
+		}
+			
+	//outer surrounding unchangable: array use structure
+}
 void InitGame() {
 	srand( (unsigned)time( NULL ) );
 	int i,j;
@@ -164,8 +186,9 @@ void Display() {//(re)display the changes
 			colorBlock(blockState[i][j],i,j);
 		}
     }
+    
+    colorBlock(RED,agent.i,agent.j);
 }
-
 void Barrier() {//Draw the grids
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight();
@@ -209,18 +232,40 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 		case KEY_DOWN:
 			switch(key){
 				case VK_F1:
-//					if(lock == 1){
-//						lock = 0;
-//						registerMouseEvent(MouseEventProcess);
-//					}else{
-//						lock = 1;
-//					}
-//					break;
+					if(lock_change==1){
+						ClearMaze();//To DO :the surrounding barriers
+						Display();
+						lock_change=1-lock_change;
+					}else{
+						lock_change=1-lock_change;
+					}
+					break;
 				case VK_F2:
 					InitGame();
 					Display();
+					lock_change=1;
 					break;
 				case VK_F4:
+					break;
+				case VK_UP:
+					if(check(agent.i+1,agent.j)!=1)
+					agent.i++;
+					Display();
+					break;
+				case VK_DOWN:
+					if(check(agent.i-1,agent.j)!=1)
+					agent.i--;
+					Display();
+					break;
+				case VK_LEFT:
+					if(check(agent.i,agent.j-1)!=1)
+					agent.j--;
+					Display();
+					break;
+				case VK_RIGHT:
+					if(check(agent.i,agent.j+1)!=1)
+					agent.j++;
+					Display();
 					break;
 			}
 			break;
@@ -230,35 +275,44 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 	}
 }
 
-//void MouseEventProcess(int x, int y, int button, int event){
-//	if(lock == 1) return;
-//	double windowWidth = GetWindowWidth();
-//    double windowHeight = GetWindowHeight();
-//    double blockL = windowWidth / X;
-//	
-//    uiGetMouse(x,y,button,event); 
-//	if (button == LEFT_BUTTON && event == BUTTON_DOWN ) {
-//	
-//		int i;
-//		int curCoordinate = -1;
-//		double xx = ScaleXInches(x);
-//		double yy = ScaleYInches(y);
-//		for(i=0;i<N;i++){
-//			double px = (i % X) * blockL;
-//            double py = (i / X) * blockL;
-//			if(xx > px && xx < px + blockL && yy > py && yy < py + blockL){
-//				curCoordinate = i;
-//				break;
-//			}
-//		}
+void MouseEventProcess(int x, int y, int button, int event){
+	if(lock_change == 1) return;
+	double windowWidth = GetWindowWidth();
+    double windowHeight = GetWindowHeight();
+    double blockL = windowWidth / X;
+	
+    uiGetMouse(x,y,button,event); 
+	if (button == LEFT_BUTTON && event == BUTTON_DOWN ) {
+	
+		int i,j;
+		int curCoordinateI = -1,curCoordinateJ = -1;
+		double xx = ScaleXInches(x);
+		double yy = ScaleYInches(y);
+		for(i=0;i<X;i++){
+			for(j=0;j<X;j++){
+				double pi = i * blockL;
+            	double pj = j * blockL;
+				if(xx > pj && xx < pj + blockL && yy > pi && yy < pi + blockL){
+					curCoordinateI = i;
+					curCoordinateJ = j; 
+					break;
+				}			
+			}
+		}
+		
+		if(curCoordinateI>=0&&curCoordinateJ>=0&&(blockState[curCoordinateI][curCoordinateJ]== VACANT||blockState[curCoordinateI][curCoordinateJ]== BARRIER)){
+			blockState[curCoordinateI][curCoordinateJ]=1-blockState[curCoordinateI][curCoordinateJ];
+		}
+		
+		
 //		if (curCoordinate < N  && curCoordinate >= 0 && blockState[curCoordinate] == VACANT) {
 //		 	blockState[curCoordinate] = BARRIER;
 //		}else if(curCoordinate < N && curCoordinate >= 0 && blockState[curCoordinate] == BARRIER){
 //		 	blockState[curCoordinate] = VACANT;
 //		}
-//	}
-//	Display();
-//}	
+	}
+	Display();
+}	
 
 void Main() {
 	
@@ -267,6 +321,7 @@ void Main() {
     InitGraphics();
     InitGame();
     registerKeyboardEvent(KeyboardEventProcess);
+	registerMouseEvent(MouseEventProcess);
     Display();
     
 }
