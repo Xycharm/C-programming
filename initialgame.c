@@ -204,7 +204,8 @@ void Display() {//(re)display the changes
 	"Exit | Ctrl-VK_F12"};
 	static char * menuListMazeEdit[] = {"Edit the map",
 		"Generate randomly | Ctrl-VK_F2",
-		"Edit manually | Ctrl-VK_F1"};
+		"Edit manually | Ctrl-VK_F3",
+		"Clear and edit | Ctrl-VK_F1"};
 	static char * menuListMazeSolve[] = {"Solve",
 		"Manually",
 		"Automatically"};
@@ -241,34 +242,41 @@ void Display() {//(re)display the changes
 	//Edit the map
 	selection = menuList(GenUIID(0), x+w,  y-h, w, wlist,h, menuListMazeEdit,sizeof(menuListMazeEdit)/sizeof(menuListMazeEdit[0]));
 	if( selection > 0 ) selectedLabel = menuListMazeEdit[selection];
-	if( selection == 2 ){
-		InitGame();
-		Display();
-		lock_change=1;
-	}else if( selection == 1 ){
-		if(lock_change==1){
+	if( selection == 3 ){
+		if(lock_change == 1){
 			ClearMaze();//To DO :the surrounding barriers
 			Display();
-			lock_change=1-lock_change;
+			lock_change = 1-lock_change;
 		}else{
-			lock_change=1-lock_change;
+			lock_change = 1-lock_change;
 		}
+	}
+	else if( selection == 2 ){
+		if(lock_change == 1){
+			lock_change = 0;
+		}else{
+			lock_change = 1;
+		}
+	}else if( selection == 1 ){
+		InitGame();
+		Display();
+		lock_change = 1;
 	}
 	//Solve
 	selection = menuList(GenUIID(0),x+2*w,y-h, w, wlist, h, menuListMazeSolve,sizeof(menuListMazeSolve)/sizeof(menuListMazeSolve[0]));
 	if( selection > 0 ) selectedLabel = menuListMazeSolve[selection];
 	if( selection == 2 ){
-		//Manually
-	}else if( selection == 1 ){
 		//Automatically
+	}else if( selection == 1 ){
+		//Manually
 	}
 	//Help
 	selection = menuList(GenUIID(0),x+3*w,y-h, w, wlist, h, menuListHelp,sizeof(menuListHelp)/sizeof(menuListHelp[0]));
 	if( selection > 0 ) selectedLabel = menuListHelp[selection];
 	if( selection == 2 ){
-		Guide();
-	}else if( selection == 1 ){
 		About();
+	}else if( selection == 1 ){
+		Guide();
 	}
 
 }
@@ -337,11 +345,11 @@ void LoadMap(){
 }
 
 void About(){
-	double ww  = GetWindowWidth();
+	/*double ww  = GetWindowWidth();
 	double wh = GetWindowHeight();
 	
-	double cx = ww / 5;
-	double cy = wh / 5;
+	double cx = ww / 2;
+	double cy = wh / 2;
 	double len = ww / 1.5;
 	
     SetPenColor("White");
@@ -352,21 +360,25 @@ void About(){
     DrawLine(-len, 0);
     EndFilledRegion();
     
-    char *str = "@adout.\nThis is a maze game where players can both try to solve it by themselves or get some hints.\nAnd there're two ways to get a new maze,including generating by the program or by player.\ncreated by Xu Yang and Zheng Jiyun in 2023.\n";
+    SetPenColor("Black");
+    StartFilledRegion(1);
+    DrawLine(0, len);
+    DrawLine(len, 0);
+    DrawLine(0, -len);
+    DrawLine(-len, 0);
+    
+    char *str = "ABOUT\nThis is a maze game where players can both try to solve it by themselves or get some hints.\nAnd there're two ways to get a new maze,including generating by the program or by player.\ncreated by Xu Yang and Zheng Jiyun in 2023.\n";
 	double fontAscent  = GetFontAscent();
 	double tw = TextStringWidth(str);
-	MovePen(cx - len / 2, cy - fontAscent / 2);
+	MovePen(cx - len / 2, cy - len / 2 + fontAscent / 2);
 	SetPenColor("Black");
-	DrawTextString(str);
+	DrawTextString(str);*/
     
 	
 }
 
 void Guide(){
-	InitConsole();
-	printf("How to play:\n");
 
-    InitGraphics();
 }
 
 void KeyboardEventProcess(int key,int event){//Keyboard
