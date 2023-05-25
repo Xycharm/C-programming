@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include "extgraph.h"
 #include "genlib.h"
+#include "imgui.h"
 #include "simpio.h"
 #include "random.h"
 #include "strlib.h"
@@ -20,7 +21,7 @@
 
 #include "linkedlist.h"
 
-#include "random.h"0
+#include "random.h"
 #define X 51
 //must be odd
 #define  VACANT  0
@@ -179,8 +180,10 @@ void InitGame() {
 	randomDFS(1,1);
 	agent.i=1;agent.j=1;
 }
+
 void Display() {//(re)display the changes
     DisplayClear();
+    
     int i = 0,j = 0;
     Barrier();
     for (i = 0; i < X; i++) {
@@ -190,10 +193,88 @@ void Display() {//(re)display the changes
     }
     
     colorBlock(RED,agent.i,agent.j);
+    
+    double ww  = GetWindowWidth();
+	double wh = GetWindowHeight();
+	
+	static char * menuListFile[] = {"File",
+	"New | ",
+	"Open | Ctrl-VK_F5",
+	"Save | Ctrl-VK_F4",
+	"Exit | Ctrl-VK_F12"};
+	static char * menuListMazeEdit[] = {"Edit the map",
+		"Generate randomly | Ctrl-VK_F2",
+		"Edit manually | Ctrl-VK_F1"};
+	static char * menuListMazeSolve[] = {"Solve",
+		"Manually",
+		"Automatically"};
+	static char * menuListHelp[] = {"Help",
+		"How to play",
+		"About"};
+	static char * selectedLabel = NULL;
+	
+	double fH = GetFontHeight();
+	double x = 0; //fH/8;
+	double y = wh;
+	double h = fH * 1.5; // controler height
+	double w = ww/4; // controler width
+	double wlist = TextStringWidth(menuListMazeEdit[1])*1.2;
+	double xindent = wh/20; 
+	int    selection;
+	bool   enable_rotation = 1;
+	bool   show_more_buttons = 1;
+	
+	drawMenuBar(0,y-h,ww,h);
+	//File
+	selection = menuList(GenUIID(0), x, y-h, w, wlist, h, menuListFile, sizeof(menuListFile)/sizeof(menuListFile[0]));
+	if( selection > 0 ) selectedLabel = menuListFile[selection];
+	if( selection == 4 )
+		exit(-1); // choose to exit
+	else if( selection == 3 ) {
+		SaveMap();
+	}else if(selection == 2 ){
+		LoadMap();
+		Display();
+	}else if(selection == 1 ){
+		//new
+	}
+	//Edit the map
+	selection = menuList(GenUIID(0), x+w,  y-h, w, wlist,h, menuListMazeEdit,sizeof(menuListMazeEdit)/sizeof(menuListMazeEdit[0]));
+	if( selection > 0 ) selectedLabel = menuListMazeEdit[selection];
+	if( selection == 2 ){
+		InitGame();
+		Display();
+		lock_change=1;
+	}else if( selection == 1 ){
+		if(lock_change==1){
+			ClearMaze();//To DO :the surrounding barriers
+			Display();
+			lock_change=1-lock_change;
+		}else{
+			lock_change=1-lock_change;
+		}
+	}
+	//Solve
+	selection = menuList(GenUIID(0),x+2*w,y-h, w, wlist, h, menuListMazeSolve,sizeof(menuListMazeSolve)/sizeof(menuListMazeSolve[0]));
+	if( selection > 0 ) selectedLabel = menuListMazeSolve[selection];
+	if( selection == 2 ){
+		//Manually
+	}else if( selection == 1 ){
+		//Automatically
+	}
+	//Help
+	selection = menuList(GenUIID(0),x+3*w,y-h, w, wlist, h, menuListHelp,sizeof(menuListHelp)/sizeof(menuListHelp[0]));
+	if( selection > 0 ) selectedLabel = menuListHelp[selection];
+	if( selection == 2 ){
+		Guide();
+	}else if( selection == 1 ){
+		About();
+	}
+
 }
 void Barrier() {//Draw the grids
     double windowWidth = GetWindowWidth();
-    double windowHeight = GetWindowHeight();
+    double windowHeight = GetWindowHeight() - 2;
     double blockL = windowWidth / X;
     int j = 0;
     SetPenColor("Black");
@@ -210,7 +291,7 @@ void Barrier() {//Draw the grids
 void colorBlock(int color, int x,int y) { //Draw the color blocks
     if (color == VACANT)return;
     double windowWidth = GetWindowWidth();
-    double windowHeight = GetWindowHeight();
+    double windowHeight = GetWindowHeight() - 2;
     double blockL = windowWidth / X;
 
     double px = x * blockL;
@@ -254,24 +335,66 @@ void LoadMap(){
 	fread(blockState,sizeof(int),X*X,fp);
 	fclose(fp);	
 }
+
+void About(){
+	double ww  = GetWindowWidth();
+	double wh = GetWindowHeight();
+	
+	double cx = ww / 5;
+	double cy = wh / 5;
+	double len = ww / 1.5;
+	
+    SetPenColor("White");
+    StartFilledRegion(1);
+    DrawLine(0, len);
+    DrawLine(len, 0);
+    DrawLine(0, -len);
+    DrawLine(-len, 0);
+    EndFilledRegion();
+    
+    char *str = "@adout.\nThis is a maze game where players can both try to solve it by themselves or get some hints.\nAnd there're two ways to get a new maze,including generating by the program or by player.\ncreated by Xu Yang and Zheng Jiyun in 2023.\n";
+	double fontAscent  = GetFontAscent();
+	double tw = TextStringWidth(str);
+	MovePen(cx - len / 2, cy - fontAscent / 2);
+	SetPenColor("Black");
+	DrawTextString(str);
+    
+	
+}
+
+void Guide(){
+	InitConsole();
+	printf("How to play:\n");
+
+    InitGraphics();
+}
+
 void KeyboardEventProcess(int key,int event){//Keyboard
+    uiGetKeyboard(key, event);
     int i;
 	switch(event){
 		case KEY_DOWN:
 			switch(key){
 				case VK_F1:
-					if(lock_change==1){
+					if(lock_change == 1){
 						ClearMaze();//To DO :the surrounding barriers
 						Display();
-						lock_change=1-lock_change;
+						lock_change = 1-lock_change;
 					}else{
-						lock_change=1-lock_change;
+						lock_change = 1-lock_change;
 					}
 					break;
 				case VK_F2:
 					InitGame();
 					Display();
-					lock_change=1;
+					lock_change = 1;
+					break;
+				case VK_F3:	//edit on the existing map
+				    if(lock_change == 1){
+						lock_change = 0;
+					}else{
+						lock_change = 1;
+					}
 					break;
 				case VK_F4://save map
 					SaveMap();
@@ -279,6 +402,9 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 				case VK_F5://read map
 					LoadMap();
 					Display();
+					break;
+				case VK_F6:
+					Guide();
 					break;
 				case VK_F12://exit
 					exit(0);
@@ -309,15 +435,16 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 			break;
 	
 	}
+	Display();
 }
 
 void MouseEventProcess(int x, int y, int button, int event){
-	if(lock_change == 1) return;
+	uiGetMouse(x,y,button,event); 
+//	if(lock_change == 1) return;
 	double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight();
     double blockL = windowWidth / X;
 	
-    uiGetMouse(x,y,button,event); 
 	if (button == LEFT_BUTTON && event == BUTTON_DOWN ) {
 	
 		int i,j;
@@ -336,7 +463,7 @@ void MouseEventProcess(int x, int y, int button, int event){
 			}
 		}
 		
-		if(curCoordinateI>=0&&curCoordinateJ>=0&&(blockState[curCoordinateI][curCoordinateJ]== VACANT||blockState[curCoordinateI][curCoordinateJ]== BARRIER)){
+		if(lock_change == 0 && curCoordinateI>=0 && curCoordinateJ>=0 && (blockState[curCoordinateI][curCoordinateJ] == VACANT||blockState[curCoordinateI][curCoordinateJ] == BARRIER)){
 			blockState[curCoordinateI][curCoordinateJ]=1-blockState[curCoordinateI][curCoordinateJ];
 		}
 		
@@ -351,10 +478,10 @@ void MouseEventProcess(int x, int y, int button, int event){
 }	
 
 void Main() {
-	
     SetWindowTitle("Maze");
-    SetWindowSize(X, X);
+    SetWindowSize(X, X+2);
     InitGraphics();
+    //InitConsole();
     InitGame();
     registerKeyboardEvent(KeyboardEventProcess);
 	registerMouseEvent(MouseEventProcess);

@@ -95,7 +95,7 @@ void mySetPenColor(char *color)
  *  DefineColor("Black", 0, 0, 0);
  *  DefineColor("Dark Gray", .35, .35, .35);
  *  DefineColor("Gray", .6, .6, .6);
- *  DefineColor("Light Gray", .75, .75, .75);
+ *  DefineColor("Light Gray", .8, .75, .75);
  *  DefineColor("White", 1, 1, 1);
  *  DefineColor("Brown", .35, .20, .05);
  *  DefineColor("Red", 1, 0, 0);
@@ -128,15 +128,15 @@ static struct {
 },
 
 gs_menu_color = {
-	"Blue",      "Blue",	"Red",	    "Red",   0 , // 不填充
+	"blue",      "blue",	"Red",	    "Red",   1 , // 填充
 },
 
 gs_button_color = {
-	"Blue",      "Blue",	"Red",	    "Red",   0 , // 不填充
+	"Blue",      "Blue",	"Red",	    "Red",   0 , // 填充
 },
 
 gs_textbox_color = {
-	"Blue",      "Blue",	"Red",	    "Red",   0 , // 不填充
+	"Blue",      "Blue",	"Red",	    "Red",   0 , // 填充
 };
 
 void setButtonColors(char *frame, char*label, char *hotFrame, char *hotLabel, int fillflag)
@@ -361,8 +361,8 @@ static int menuItem(int id, double x, double y, double w, double h, char *label)
 	char * frameColor = gs_menu_color.frame;
 	char * labelColor = gs_menu_color.label;
 	if (inBox(gs_UIState.mousex, gs_UIState.mousey, x, x + w, y, y + h)) {
-		frameColor = gs_menu_color.hotFrame;
-		labelColor = gs_menu_color.hotLabel;
+		frameColor = "Red";
+		labelColor = "Red";
 		//if (gs_UIState.mousedown) {
 		if ( (gs_UIState.clickedItem == id ||gs_UIState.clickedItem == 0) && gs_UIState.mousedown) {
 			gs_UIState.clickedItem = id;
@@ -477,7 +477,7 @@ int menuList(int id, double x, double y, double w, double wlist, double h, char 
 
 void drawMenuBar(double x, double y, double w, double h)
 {
-	mySetPenColor(gs_menu_color.frame);
+	mySetPenColor("white");
 	drawRectangle(x,y,w,h,gs_menu_color.fillflag);
 }
 
@@ -593,6 +593,7 @@ int textbox(int id, double x, double y, double w, double h, char textbuf[], int 
 /* 画一个矩形 */
 void drawRectangle(double x, double y, double w, double h, int fillflag)
 {
+	mySetPenColor("Light Gray");
 	MovePen(x, y);
 	if( fillflag ) StartFilledRegion(1); 
 	{
@@ -600,8 +601,13 @@ void drawRectangle(double x, double y, double w, double h, int fillflag)
 		DrawLine(w, 0);
 		DrawLine(0, -h);
 		DrawLine(-w, 0);
-	}
-	if( fillflag ) EndFilledRegion();
+	}if( fillflag ) EndFilledRegion();
+	
+	mySetPenColor("Blue");
+	DrawLine(0, h);
+	DrawLine(w, 0);
+	DrawLine(0, -h);
+	DrawLine(-w, 0);
 }
 
 /* 画一个矩形，并在其内部居中显示一个字符串标签label */
