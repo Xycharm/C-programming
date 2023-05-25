@@ -166,6 +166,7 @@ void ClearMaze(){
 	//outer surrounding unchangable: array use structure
 }
 void InitGame() {
+	
 	srand( (unsigned)time( NULL ) );
 	int i,j;
 	for(i=0;i<X;i++){
@@ -176,6 +177,7 @@ void InitGame() {
 	blockState[1][1]=START;
 	blockState[X-2][X-2]=DEST;
 	randomDFS(1,1);
+	agent.i=1;agent.j=1;
 }
 void Display() {//(re)display the changes
     DisplayClear();
@@ -225,7 +227,33 @@ void colorBlock(int color, int x,int y) { //Draw the color blocks
 
 
 }
+void SaveMap(){
+	char filename[2048] = { 0 };
+ 	if (!SaveFileDialog("graphic file(*.data)\0*.data\0", filename)) 
+ 		return;
+	
+	FILE *fp;
+	if (!(fp = fopen(filename, "wb"))) {
+		MessageBox(NULL, filename, "fail to open",  MB_OK | MB_ICONWARNING);
+		return;
+	}
+	fwrite(blockState,sizeof(int),X*X,fp);
+	
+	fclose(fp);
+}
+void LoadMap(){
+	char filename[2048] = { 0 };
+ 	if (!OpenFileDialog("????(*.data)\0*.data\0", filename)) 
+ 		return;
 
+	FILE *fp;
+	if (!(fp = fopen(filename, "rb"))) {
+		MessageBox(NULL, filename, "??????",  MB_OK | MB_ICONWARNING);
+		return;
+	}
+	fread(blockState,sizeof(int),X*X,fp);
+	fclose(fp);	
+}
 void KeyboardEventProcess(int key,int event){//Keyboard
     int i;
 	switch(event){
@@ -245,7 +273,15 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					Display();
 					lock_change=1;
 					break;
-				case VK_F4:
+				case VK_F4://save map
+					SaveMap();
+					break;
+				case VK_F5://read map
+					LoadMap();
+					Display();
+					break;
+				case VK_F12://exit
+					exit(0);
 					break;
 				case VK_UP:
 					if(check(agent.i+1,agent.j)!=1)
