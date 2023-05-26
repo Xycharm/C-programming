@@ -22,14 +22,14 @@
 #include "linkedlist.h"
 
 #include "random.h"
-#define X 11
+#define X 21
 //must be odd
 #define  VACANT  0
 #define BARRIER  1
 #define     RED  2
 #define    DEST  3
 #define   START  4
-
+//TODO: change into structure  ; outer surrounding unchangable: array use structure
 
 int blockState[X][X];//record the states of blocks
 int visit[X][X];//record traces
@@ -69,6 +69,7 @@ int direction_feasible(int i, int j){
     //return -1 if infeasible,otherwise  0up 1right 2down 3left(in array-coordinate)
 }
 int direction_judge(int i, int j,int dir){
+	//judge whether a direction is visible 
 
         switch (dir) {
             case 0:
@@ -92,12 +93,13 @@ int direction_judge(int i, int j,int dir){
     //return -1 /*reversed 0up 1right 2down 3left
 }
 void randomDFS(int i,int j){
+	//use random algorithm to generate a maze
     if (direction_feasible(i,j)==-1) return;
     int rand_way=rand()%4;
     int k;
 	for(k=0;k<4;k++) {
         if(direction_judge(i,j,(k+rand_way)%4)==1){
-            switch ((k+rand_way)%4) {
+            switch ((k+rand_way)%4) {//traverse all feasible direction
                 case 0:
                     if (blockState[i][j + 1] == BARRIER) {
                         blockState[i][j + 1] = VACANT;
@@ -150,6 +152,7 @@ void ClearMaze(){
 	}
 	blockState[1][1]=START;
 	blockState[X-2][X-2]=DEST;
+	//boundary_filling
 		for(i=0;i<X;i++){
 		blockState[i][0]=BARRIER;
 		blockState[i][X-1]=BARRIER;
@@ -157,7 +160,7 @@ void ClearMaze(){
 		blockState[X-1][i]=BARRIER;
 		}
 			
-	//outer surrounding unchangable: array use structure
+
 }
 void InitGame() {
 	play = 0;
