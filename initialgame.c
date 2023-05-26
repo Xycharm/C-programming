@@ -35,8 +35,9 @@ int blockState[X][X];//TO DO:change into a structure array
 struct{
 	int i;
 	int j;
-}agent={1,1};
-int lock_change=1;
+}agent = {1,1};
+int lock_change = 1;
+int play = 0;
 char *colors[]={0,"Black","Red","Yellow","Green"};//store the color strings
 int check(int i,int j){//return 0 if cant else 1
     if(i<0||i>=X||j<0||j>=X)return 0;
@@ -167,7 +168,7 @@ void ClearMaze(){
 	//outer surrounding unchangable: array use structure
 }
 void InitGame() {
-	
+	play = 0;
 	srand( (unsigned)time( NULL ) );
 	int i,j;
 	for(i=0;i<X;i++){
@@ -203,7 +204,7 @@ void Display() {//(re)display the changes
 	"Save | Ctrl-VK_F4",
 	"Exit | Ctrl-VK_F12"};
 	static char * menuListMazeEdit[] = {"Edit the map",
-		"Generate randomly | Ctrl-VK_F2",
+		"Regenerate | Ctrl-VK_F2",
 		"Edit manually | Ctrl-VK_F3",
 		"Clear and edit | Ctrl-VK_F1"};
 	static char * menuListMazeSolve[] = {"Solve",
@@ -267,8 +268,9 @@ void Display() {//(re)display the changes
 	if( selection > 0 ) selectedLabel = menuListMazeSolve[selection];
 	if( selection == 2 ){
 		//Automatically
+		play = 0;
 	}else if( selection == 1 ){
-		//Manually
+		play = 1;
 	}
 	//Help
 	selection = menuList(GenUIID(0),x+3*w,y-h, w, wlist, h, menuListHelp,sizeof(menuListHelp)/sizeof(menuListHelp[0]));
@@ -345,14 +347,15 @@ void LoadMap(){
 }
 
 void About(){
-	/*double ww  = GetWindowWidth();
+	double ww  = GetWindowWidth();
 	double wh = GetWindowHeight();
 	
 	double cx = ww / 2;
 	double cy = wh / 2;
 	double len = ww / 1.5;
 	
-    SetPenColor("White");
+    MovePen(cx - len / 2, cy - len / 2 );
+	SetPenColor("White");
     StartFilledRegion(1);
     DrawLine(0, len);
     DrawLine(len, 0);
@@ -360,25 +363,65 @@ void About(){
     DrawLine(-len, 0);
     EndFilledRegion();
     
+    MovePen(cx - len / 2, cy - len / 2 );
     SetPenColor("Black");
+    DrawLine(0, len);
+    DrawLine(len, 0);
+    DrawLine(0, -len);
+    DrawLine(-len, 0);
+
+    char *str = "ABOUT";
+    //ABOUT\nThis is a maze game where players can both try to solve it by themselves or get some hints.\nAnd there're two ways to get a new maze,including generating by the program or by player.\ncreated by Xu Yang and Zheng Jiyun in 2023.\n";
+	double fontAscent  = GetFontAscent();
+	double tw = TextStringWidth(str);
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent);
+	SetPenColor("Black");
+	DrawTextString(str);
+	
+}
+
+void Guide(){
+	double ww  = GetWindowWidth();
+	double wh = GetWindowHeight();
+	
+	double cx = ww / 2;
+	double cy = wh / 2;
+	double len = ww / 1.2;
+	
+    MovePen(cx - len / 2, cy - len / 2 );
+	SetPenColor("White");
     StartFilledRegion(1);
     DrawLine(0, len);
     DrawLine(len, 0);
     DrawLine(0, -len);
     DrawLine(-len, 0);
+    EndFilledRegion();
     
-    char *str = "ABOUT\nThis is a maze game where players can both try to solve it by themselves or get some hints.\nAnd there're two ways to get a new maze,including generating by the program or by player.\ncreated by Xu Yang and Zheng Jiyun in 2023.\n";
-	double fontAscent  = GetFontAscent();
-	double tw = TextStringWidth(str);
-	MovePen(cx - len / 2, cy - len / 2 + fontAscent / 2);
-	SetPenColor("Black");
-	DrawTextString(str);*/
-    
+    MovePen(cx - len / 2, cy - len / 2 );
+    SetPenColor("Black");
+    DrawLine(0, len);
+    DrawLine(len, 0);
+    DrawLine(0, -len);
+    DrawLine(-len, 0);
+
+    char *str1 = "HOW TO PLAY";
+    char *str2 = "  clear the map and biuld your own: F1 / Edit the map->Regenerate";
+    char *str3 = "  Regenerate a map: F2 / Edit the map->Clear and edit";
+    char *str4 = "  Edit the map: F3 / Edit the map->Edit manually";
+    char *str5 = "HOW TO PLAY";
+    char *str6 = "HOW TO PLAY";
+    char *str7 = "HOW TO PLAY";
+    char *str8 = "HOW TO PLAY";
+    double fontAscent  = GetFontAscent();
 	
-}
-
-void Guide(){
-
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent);
+	SetPenColor("Black");
+	DrawTextString(str1);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 2);
+	DrawTextString(str2);
+	
+  
 }
 
 void KeyboardEventProcess(int key,int event){//Keyboard
@@ -422,21 +465,25 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					exit(0);
 					break;
 				case VK_UP:
+					if(play == 0)break;
 					if(check(agent.i+1,agent.j)!=1)
 					agent.i++;
 					Display();
 					break;
 				case VK_DOWN:
+					if(play == 0)break;
 					if(check(agent.i-1,agent.j)!=1)
 					agent.i--;
 					Display();
 					break;
 				case VK_LEFT:
+					if(play == 0)break;
 					if(check(agent.i,agent.j-1)!=1)
 					agent.j--;
 					Display();
 					break;
 				case VK_RIGHT:
+					if(play == 0)break;
 					if(check(agent.i,agent.j+1)!=1)
 					agent.j++;
 					Display();
@@ -498,7 +545,7 @@ void Main() {
     registerKeyboardEvent(KeyboardEventProcess);
 	registerMouseEvent(MouseEventProcess);
     Display();
-    
+    About();
 }
 
 
