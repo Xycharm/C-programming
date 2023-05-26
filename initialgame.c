@@ -22,7 +22,7 @@
 #include "linkedlist.h"
 
 #include "random.h"
-#define X 51
+#define X 11
 //must be odd
 #define  VACANT  0
 #define BARRIER  1
@@ -31,27 +31,25 @@
 #define   START  4
 
 
-int blockState[X][X];//TO DO:change into a structure array
-struct{
-	int i;
-	int j;
-}agent = {1,1};
-int lock_change = 1;
+int blockState[X][X];//record the states of blocks
+int visit[X][X];//record traces
+int count;//record the number of traces
+int _visit[99][X][X];//backup of 'visit'
+int _blockState[X][X];//backup of 'blockState'
+struct{int i;int j;}agent = {1,1};//the position of agent
+int lock_change = 1;//whether being able to change the map
 int play = 0;
 char *colors[]={0,"Black","Red","Yellow","Green"};//store the color strings
-int check(int i,int j){//return 0 if cant else 1
+int check(int i,int j){
+	//used while generating the maze,if 
     if(i<0||i>=X||j<0||j>=X)return 0;
     if(blockState[i][j]==VACANT)return 0;
     if(blockState[i][j]==BARRIER)return 1;
     return -1;
 }
 int direction_feasible(int i, int j){
-
-
-
     int k=0;
     for(k=0;k<4;k++){
-        
         switch (k) {
             case 0:
                 if(check(i,j+2)!=0)return 0;
@@ -66,13 +64,9 @@ int direction_feasible(int i, int j){
                 if(check(i-2,j)!=0)return 3;
                 break;
         }
-
     }
-
-
-
     return -1;
-    //return -1 /*reversed 0up 1right 2down 3left
+    //return -1 if infeasible,otherwise  0up 1right 2down 3left(in array-coordinate)
 }
 int direction_judge(int i, int j,int dir){
 
@@ -97,7 +91,6 @@ int direction_judge(int i, int j,int dir){
     return -1;
     //return -1 /*reversed 0up 1right 2down 3left
 }
-
 void randomDFS(int i,int j){
     if (direction_feasible(i,j)==-1) return;
     int rand_way=rand()%4;
@@ -148,7 +141,6 @@ void randomDFS(int i,int j){
 
     }
 }
-
 void ClearMaze(){
 	int i,j;
 	for(i=0;i<X;i++){
@@ -181,7 +173,6 @@ void InitGame() {
 	randomDFS(1,1);
 	agent.i=1;agent.j=1;
 }
-
 void Display() {//(re)display the changes
     DisplayClear();
     
@@ -297,7 +288,6 @@ void Barrier() {//Draw the grids
         DrawLine(windowWidth, 0);
     }
 }
-
 void colorBlock(int color, int x,int y) { //Draw the color blocks
     if (color == VACANT)return;
     double windowWidth = GetWindowWidth();
@@ -345,7 +335,6 @@ void LoadMap(){
 	fread(blockState,sizeof(int),X*X,fp);
 	fclose(fp);	
 }
-
 void About(){
 	double ww  = GetWindowWidth();
 	double wh = GetWindowHeight();
@@ -379,7 +368,6 @@ void About(){
 	DrawTextString(str);
 	
 }
-
 void Guide(){
 	double ww  = GetWindowWidth();
 	double wh = GetWindowHeight();
@@ -423,7 +411,41 @@ void Guide(){
 	
   
 }
+void solve(int i, int j){
+    visit[i][j]=1;
+//    printf("(%d,%d)",i,j);
+    if(i==X-2&&j==X-2&&count<69){
+    	int k_i,k_j;
+		for(k_i=0;k_i<X;k_i++){
+			for(k_j=0;k_j<X;k_j++){
+				_visit[count][k_i][k_j]=visit[k_i][k_j];		
+			}
 
+		}
+		count++;
+	}
+    int di[]={0,0,1,-1};
+    int dj[]={1,-1,0,0};
+    int k;
+	for(k=0;k<4;k++){
+        int _i=i+di[k];
+        int _j=j+dj[k] ;
+        if((blockState[_i][_j]==VACANT||blockState[_i][_j]==DEST) &&visit[_i][_j]==0){
+            solve(_i,_j);
+        }
+    }
+    visit[i][j]=0;
+
+}
+void visualize(int count){
+//    int i,j;
+//    for (i = 0; i < X; i++) {
+//		for(j=0;j<X;j++ ){
+//			if(_visit[count][i][j])
+//			colorBlock(RED,i,j);
+//		}
+//    }
+}
 void KeyboardEventProcess(int key,int event){//Keyboard
     uiGetKeyboard(key, event);
     int i;
@@ -488,6 +510,10 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					agent.j++;
 					Display();
 					break;
+				case 'S':
+					solve(1,1);
+					visualize(0);
+					break;
 			}
 			break;
 		case KEY_UP:
@@ -496,7 +522,6 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 	}
 	Display();
 }
-
 void MouseEventProcess(int x, int y, int button, int event){
 	uiGetMouse(x,y,button,event); 
 //	if(lock_change == 1) return;
@@ -535,12 +560,11 @@ void MouseEventProcess(int x, int y, int button, int event){
 	}
 	Display();
 }	
-
 void Main() {
     SetWindowTitle("Maze");
     SetWindowSize(X, X+2);
     InitGraphics();
-    //InitConsole();
+    InitConsole();
     InitGame();
     registerKeyboardEvent(KeyboardEventProcess);
 	registerMouseEvent(MouseEventProcess);
