@@ -22,7 +22,7 @@
 #include "linkedlist.h"
 
 #include "random.h"
-#define X 5
+#define X 21
 //must be odd
 #define  VACANT  0
 #define BARRIER  1
@@ -285,8 +285,21 @@ void Display() {//(re)display the changes
 	//File
 	selection = menuList(GenUIID(0), x, y-h, w, wlist, h, menuListFile, sizeof(menuListFile)/sizeof(menuListFile[0]));
 	if( selection > 0 ) selectedLabel = menuListFile[selection];
-	if( selection == 4 )
-		exit(-1); // choose to exit
+	if( selection == 4 ){
+		i = 1;
+	                while(Head[i]){
+	                	while(Head[i]){
+		                    struct visits_node *node;
+		                    node = Head[i]->next;
+		                    free(Head[i]);
+		                    Head[i] = node;
+		                }
+	                	i++;
+                	}
+		exit(0); // choose to exit
+		
+	}
+	
 	else if( selection == 3 ) {
 		SaveMap();
 	}else if(selection == 2 ){
