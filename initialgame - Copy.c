@@ -57,7 +57,7 @@ void InitGame() {
 	    count = 0;
         explore(path, start, 0);
 	}while(count == 0);//make sure that there's at least one path
-	shown_count == 0;
+	shown_count = 0;
     InitConsole();
     printf("yes\n");
 }
@@ -172,7 +172,7 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					printf("%d/%d\n", shown_count, count);
 					int j;
 					for(j = 0;j < soFar;j++){
-						printf("%d->",paths[shown_count][j]);
+						printf("%d->", paths[shown_count][j]);
 						colorBlock(RED, paths[shown_count][j]);
 					}
 					printf("\n");

@@ -22,7 +22,7 @@
 #include "linkedlist.h"
 
 #include "random.h"
-#define X 21
+#define X 5
 //must be odd
 #define  VACANT  0
 #define BARRIER  1
@@ -30,16 +30,75 @@
 #define    DEST  3
 #define   START  4
 //TODO: change into structure  ; outer surrounding unchangable: array use structure
+void callsolve();
+void solve(int visit[X][X], int ci, int cj, int length);
+void visualize();
 
 int blockState[X][X];//record the states of blocks
-int visit[X][X];//record traces
-int count;//record the number of traces
-int _visit[99][X][X];//backup of 'visit'
+
+int visit[X][X];
+struct visits_node{
+	int x;
+	int y;
+	struct visits_node *next;
+};
+struct visits_node *Head[99] = {NULL};
 int _blockState[X][X];//backup of 'blockState'
-struct{int i;int j;}agent = {1,1};//the position of agent
+int lengths[X*X];
+int soFar, count;
+int shown_count;
+struct{
+    int i;
+	int j;
+	}agent = {1,1};//the position of agent
+	
 int lock_change = 1;//whether being able to change the map
 int play = 0;
-char *colors[]={0,"Black","Red","Yellow","Green"};//store the color strings
+char *colors[]={"White","Black","Red","Yellow","Green"};//store the color strings
+void lock(int lock_change){
+	double ww  = GetWindowWidth();
+   	double wh = GetWindowHeight();
+   	double fH = GetFontHeight();
+	double x = 0; //fH/8;
+	double y = wh;
+	double h = fH * 1.5; // controler height
+	double w = ww/4; // controler width
+    char *str1 = "locked";
+    char *str2 = "unlocked";
+    double fontAscent  = GetFontAscent();
+    double tw = TextStringWidth(str2);
+    double len = tw + 1; 
+	
+    if(lock_change){
+    	MovePen(x, y - h * 3);
+        SetPenColor("Blue");
+        StartFilledRegion(1);
+        DrawLine(0, h);
+        DrawLine(len , 0);
+        DrawLine(0, -h);
+        DrawLine(-len, 0);
+        EndFilledRegion();
+        
+        MovePen(len / 2 - tw / 2, y - h * 2.5 - fontAscent / 2);
+	    SetPenColor("Black");
+        DrawTextString(str1);
+        
+	}else{
+		MovePen(x, y - h * 3);
+        SetPenColor("Blue");
+        StartFilledRegion(1);
+        DrawLine(0, h);
+        DrawLine(len , 0);
+        DrawLine(0, -h);
+        DrawLine(-len, 0);
+        EndFilledRegion();
+        
+        MovePen(len / 2 - tw / 2, y - h * 2.5 - fontAscent / 2);
+	    SetPenColor("Black");
+        DrawTextString(str2);
+	}
+    
+}
 int check(int i,int j){
 	//used while generating the maze,if 
     if(i<0||i>=X||j<0||j>=X)return 0;
@@ -175,10 +234,12 @@ void InitGame() {
 	blockState[X-2][X-2]=DEST;
 	randomDFS(1,1);
 	agent.i=1;agent.j=1;
+	callsolve();
+	printf("\n");
 }
 void Display() {//(re)display the changes
     DisplayClear();
-    
+    lock(lock_change);
     int i = 0,j = 0;
     Barrier();
     for (i = 0; i < X; i++) {
@@ -193,17 +254,17 @@ void Display() {//(re)display the changes
 	double wh = GetWindowHeight();
 	
 	static char * menuListFile[] = {"File",
-	"New | ",
+	"New",
 	"Open | Ctrl-VK_F5",
 	"Save | Ctrl-VK_F4",
 	"Exit | Ctrl-VK_F12"};
 	static char * menuListMazeEdit[] = {"Edit the map",
+	    "Edit manually | Ctrl-VK_F3",
 		"Regenerate | Ctrl-VK_F2",
-		"Edit manually | Ctrl-VK_F3",
 		"Clear and edit | Ctrl-VK_F1"};
 	static char * menuListMazeSolve[] = {"Solve",
 		"Manually",
-		"Automatically"};
+		"Automatically | Ctrl-VK_F7"};
 	static char * menuListHelp[] = {"Help",
 		"How to play",
 		"About"};
@@ -232,7 +293,8 @@ void Display() {//(re)display the changes
 		LoadMap();
 		Display();
 	}else if(selection == 1 ){
-		//new
+		ClearMaze();
+		Display();
 	}
 	//Edit the map
 	selection = menuList(GenUIID(0), x+w,  y-h, w, wlist,h, menuListMazeEdit,sizeof(menuListMazeEdit)/sizeof(menuListMazeEdit[0]));
@@ -241,27 +303,34 @@ void Display() {//(re)display the changes
 		if(lock_change == 1){
 			ClearMaze();//To DO :the surrounding barriers
 			Display();
-			lock_change = 1-lock_change;
-		}else{
-			lock_change = 1-lock_change;
-		}
-	}
-	else if( selection == 2 ){
-		if(lock_change == 1){
 			lock_change = 0;
+			lock(lock_change);
 		}else{
 			lock_change = 1;
+			lock(lock_change);
+			callsolve();
 		}
-	}else if( selection == 1 ){
+	}
+	else if( selection == 1 ){//by hand
+		if(lock_change == 1){
+			lock_change = 0;
+			lock(lock_change);
+		}else{
+			lock_change = 1;
+			lock(lock_change);
+		    callsolve();
+		}
+	}else if( selection == 2 ){
 		InitGame();
 		Display();
+		callsolve();
 		lock_change = 1;
 	}
 	//Solve
 	selection = menuList(GenUIID(0),x+2*w,y-h, w, wlist, h, menuListMazeSolve,sizeof(menuListMazeSolve)/sizeof(menuListMazeSolve[0]));
 	if( selection > 0 ) selectedLabel = menuListMazeSolve[selection];
 	if( selection == 2 ){
-		//Automatically
+		visualize();
 		play = 0;
 	}else if( selection == 1 ){
 		play = 1;
@@ -307,9 +376,6 @@ void colorBlock(int color, int x,int y) { //Draw the color blocks
     DrawLine(0, -blockL);
     DrawLine(-blockL, 0);
     EndFilledRegion();
-
-
-
 }
 void SaveMap(){
 	char filename[2048] = { 0 };
@@ -362,13 +428,42 @@ void About(){
     DrawLine(0, -len);
     DrawLine(-len, 0);
 
-    char *str = "ABOUT";
-    //ABOUT\nThis is a maze game where players can both try to solve it by themselves or get some hints.\nAnd there're two ways to get a new maze,including generating by the program or by player.\ncreated by Xu Yang and Zheng Jiyun in 2023.\n";
-	double fontAscent  = GetFontAscent();
-	double tw = TextStringWidth(str);
+    char *str1 = "ABOUT";
+    char *str2 = "  This is a maze game where players can both try to solve";
+    char *str3 = "it by themselves or get some hints.And there're two ways ";
+    char *str4 = "to get a new maze,including generating by the program or ";
+    char *str5 = "by player.";
+    char *str6 = "";
+    char *str7 = "";
+    char *str8 = "created by Xu Yang and Zheng Jiyun in 2023.";
+    
+    //ABOUT\n.\n generating by the program or by player.\ncreated by Xu Yang and Zheng Jiyun in 2023.\n";
+	 double fontAscent  = GetFontAscent();
+	
 	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent);
 	SetPenColor("Black");
-	DrawTextString(str);
+	DrawTextString(str1);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 2.5);
+	DrawTextString(str2);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 4);
+	DrawTextString(str3);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 5.5);
+	DrawTextString(str4);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 7);
+	DrawTextString(str5);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 8.5);
+	DrawTextString(str6);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 10);
+	DrawTextString(str7);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 11.5);
+	DrawTextString(str8);
 	
 }
 void Guide(){
@@ -399,55 +494,162 @@ void Guide(){
     char *str2 = "  clear the map and biuld your own: F1 / Edit the map->Regenerate";
     char *str3 = "  Regenerate a map: F2 / Edit the map->Clear and edit";
     char *str4 = "  Edit the map: F3 / Edit the map->Edit manually";
-    char *str5 = "HOW TO PLAY";
-    char *str6 = "HOW TO PLAY";
-    char *str7 = "HOW TO PLAY";
-    char *str8 = "HOW TO PLAY";
+    char *str8 = "  (touch F3/Edit manually again to lock the map)";
+    char *str5 = "  Start to play: Solve->Manually";
+    char *str6 = "  (use up/down/left/right on the keyboard to advance)";
+    char *str7 = "  Show the path: Solve->Automatically";
+    
     double fontAscent  = GetFontAscent();
 	
 	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent);
 	SetPenColor("Black");
 	DrawTextString(str1);
 	
-	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 2);
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 2.5);
 	DrawTextString(str2);
 	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 4);
+	DrawTextString(str3);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 5.5);
+	DrawTextString(str4);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 7);
+	DrawTextString(str8);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 8.5);
+	DrawTextString(str5);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 10);
+	DrawTextString(str6);
+	
+	MovePen(cx - len / 2 + 0.5, cy + len / 2  - fontAscent * 11.5);
+	DrawTextString(str7);
   
 }
-void solve(int i, int j){
-    visit[i][j]=1;
-//    printf("(%d,%d)",i,j);
-    if(i==X-2&&j==X-2&&count<69){
-    	int k_i,k_j;
-		for(k_i=0;k_i<X;k_i++){
-			for(k_j=0;k_j<X;k_j++){
-				_visit[count][k_i][k_j]=visit[k_i][k_j];		
-			}
-
+void callsolve(){
+	int i = 1;
+	while(Head[i]){
+		while(Head[i]){
+		    struct visits_node *node;
+		    node = Head[i]->next;
+		    free(Head[i]);
+		    Head[i] = node;
 		}
-		count++;
+		i++;
 	}
-    int di[]={0,0,1,-1};
-    int dj[]={1,-1,0,0};
-    int k;
-	for(k=0;k<4;k++){
-        int _i=i+di[k];
-        int _j=j+dj[k] ;
-        if((blockState[_i][_j]==VACANT||blockState[_i][_j]==DEST) &&visit[_i][_j]==0){
-            solve(_i,_j);
-        }
+	int j;
+	for(i = 0;i < X;i++){
+			for(j = 0;j < X;j++){
+				visit[i][j] = blockState[i][j];
+		}
     }
-    visit[i][j]=0;
+    soFar = 99999999;
+    count = 0;
+    solve(visit, 1, 1, 0);
+    shown_count = 1;
+    
+}
+void solve(int visit[X][X], int ci, int cj, int length){
+	if(length > soFar) return;
+	
+	struct visits_node *p = NULL, *tail = NULL;
+	int di[4] = {1, 0, -1, 0};
+    int dj[4] = {0, 1, 0, -1};
+    int _i, _j, k;		
+    if(ci==X-2 && cj==X-2 && soFar >= length){
+        count++;
+    	printf("%d\n",count);
+    	int k_i,k_j;
+		for(k_i = 1;k_i < X-1;k_i++){
+			for(k_j = 1;k_j < X-1;k_j++){
+				if(visit[k_i][k_j] == RED){
+					if(count >= 99) break;
+					if((p = (struct visits_node *)malloc(sizeof(struct visits_node))) == NULL ){
+    		            printf("Failed.\n");
+    		         	
+	            	}
+					p->x = k_i;
+					p->y = k_j;
+					p->next = NULL;
+					if(Head[count] == NULL){
+						Head[count] = p;	
+					}else{
+						tail->next = p;
+					}
+					tail = p;
+					//printf("%d,%d->",k_i,k_j);
+					printf("%d,%d->",tail->x,tail->y);
+				}			
+			}
+		}
+		printf("\n");
+		lengths[count] = length;
+		soFar = (length < soFar ? length : soFar);
+		return;
+	}else{
+        for(k = 0;k < 4;k++){
+            _i = ci + di[k];
+            _j = cj + dj[k];
+            if((visit[_i][_j] == VACANT || visit[_i][_j] == DEST)){
+               visit[_i][_j] = RED;
+			   solve(visit, _i, _j, length + 1);
+			   visit[_i][_j] = VACANT;
+            }
+        }
+	}
 
 }
-void visualize(int count){
-//    int i,j;
-//    for (i = 0; i < X; i++) {
-//		for(j=0;j<X;j++ ){
-//			if(_visit[count][i][j])
-//			colorBlock(RED,i,j);
-//		}
-//    }
+void visualize(){
+	if(count == 0){
+		double ww  = GetWindowWidth();
+    	double wh = GetWindowHeight();
+	
+	    double cx = ww / 2;
+	    double cy = wh / 2;
+	    double len = ww / 1.6;
+		MovePen(cx - len / 2, cy - len / 2 );
+	    SetPenColor("White");
+        StartFilledRegion(1);
+        DrawLine(0, len);
+        DrawLine(len, 0);
+        DrawLine(0, -len);
+        DrawLine(-len, 0);
+        EndFilledRegion();
+    
+        MovePen(cx - len / 2, cy - len / 2 );
+        SetPenColor("Black");
+        DrawLine(0, len);
+        DrawLine(len, 0);
+        DrawLine(0, -len);
+        DrawLine(-len, 0);
+        
+        char *str = "No valid path!";
+        double fontAscent  = GetFontAscent();
+	    double tw = TextStringWidth(str);
+    	MovePen(cx - tw / 2, cy - fontAscent / 2);
+	    SetPenColor("Black");
+    	DrawTextString(str);
+    	
+    	return;
+	}
+    Display();
+    if(shown_count > count){
+	    shown_count = 1; 
+	}
+	while(shown_count <= count && lengths[shown_count] > soFar)
+	    shown_count++;
+	printf("%d/%d\n", shown_count, count);
+	int j;
+	struct visits_node *p = NULL;
+	p = Head[shown_count];
+	for(j = 0;j < soFar;j++){
+	    printf("%d,%d->",p->x, p->y);
+		colorBlock(RED, p->x, p->y);
+		p = p->next;
+	}
+	printf("\n");
+	shown_count++;
 }
 void KeyboardEventProcess(int key,int event){//Keyboard
     uiGetKeyboard(key, event);
@@ -459,21 +661,27 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					if(lock_change == 1){
 						ClearMaze();//To DO :the surrounding barriers
 						Display();
-						lock_change = 1-lock_change;
+						lock_change = 0;
+						lock(lock_change);
 					}else{
-						lock_change = 1-lock_change;
+						lock_change = 1;
+						lock(lock_change);
+						callsolve();
 					}
 					break;
 				case VK_F2:
 					InitGame();
 					Display();
+					callsolve();
 					lock_change = 1;
 					break;
 				case VK_F3:	//edit on the existing map
 				    if(lock_change == 1){
 						lock_change = 0;
+						lock(lock_change);
 					}else{
 						lock_change = 1;
+						lock(lock_change);
 					}
 					break;
 				case VK_F4://save map
@@ -487,6 +695,16 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					Guide();
 					break;
 				case VK_F12://exit
+                    i = 1;
+	                while(Head[i]){
+	                	while(Head[i]){
+		                    struct visits_node *node;
+		                    node = Head[i]->next;
+		                    free(Head[i]);
+		                    Head[i] = node;
+		                }
+	                	i++;
+                	}
 					exit(0);
 					break;
 				case VK_UP:
@@ -513,10 +731,10 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 					agent.j++;
 					Display();
 					break;
-				case 'S':
-					solve(1,1);
-					visualize(0);
+				case VK_F7:
+					visualize();
 					break;
+	            	
 			}
 			break;
 		case KEY_UP:
@@ -527,7 +745,6 @@ void KeyboardEventProcess(int key,int event){//Keyboard
 }
 void MouseEventProcess(int x, int y, int button, int event){
 	uiGetMouse(x,y,button,event); 
-//	if(lock_change == 1) return;
 	double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight();
     double blockL = windowWidth / X;
@@ -572,7 +789,8 @@ void Main() {
     registerKeyboardEvent(KeyboardEventProcess);
 	registerMouseEvent(MouseEventProcess);
     Display();
-    About();
+    lock(lock_change);
+    
 }
 
 
