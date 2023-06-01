@@ -36,7 +36,7 @@ void colorBlock(int color, int x, int y) { //Draw the color blocks
 
 }
 
-void ClearMaze() {
+void ClearMaze() {//Clear the maze and Initialize the maze
     int i, j;
     for (i = 0; i < X; i++) {
         for (j = 0; j < X; j++) {

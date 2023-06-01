@@ -1,38 +1,39 @@
 #include"macro_and_system.h"
-void subtitle(char* title){
-double ww = GetWindowWidth();
-double wh = GetWindowHeight();
 
-double cx = ww / 2;
-double cy = wh / 2;
-double len = ww / 1.6;
-MovePen(cx - len / 2, cy - len / 2);
-SetPenColor("White");
-StartFilledRegion(1);
-DrawLine(0, len);
-DrawLine(len, 0);
-DrawLine(0, -len);
-DrawLine(-len, 0);
-EndFilledRegion();
+void subtitle(char *title) {//draw the subtitle
+    double ww = GetWindowWidth();
+    double wh = GetWindowHeight();
 
-MovePen(cx - len / 2, cy - len / 2);
-SetPenColor("Black");
-DrawLine(0, len);
-DrawLine(len, 0);
-DrawLine(0, -len);
-DrawLine(-len, 0);
+    double cx = ww / 2;
+    double cy = wh / 2;
+    double len = ww / 1.6;
+    MovePen(cx - len / 2, cy - len / 2);
+    SetPenColor("White");
+    StartFilledRegion(1);
+    DrawLine(0, len);
+    DrawLine(len, 0);
+    DrawLine(0, -len);
+    DrawLine(-len, 0);
+    EndFilledRegion();
 
-char *str = title;
-double fontAscent = GetFontAscent();
-double tw = TextStringWidth(str);
-MovePen(cx - tw / 2, cy - fontAscent / 2);
-SetPenColor("Black");
-DrawTextString(str);
+    MovePen(cx - len / 2, cy - len / 2);
+    SetPenColor("Black");
+    DrawLine(0, len);
+    DrawLine(len, 0);
+    DrawLine(0, -len);
+    DrawLine(-len, 0);
+
+    char *str = title;
+    double fontAscent = GetFontAscent();
+    double tw = TextStringWidth(str);
+    MovePen(cx - tw / 2, cy - fontAscent / 2);
+    SetPenColor("Black");
+    DrawTextString(str);
 
 }
 
 
-void About() {
+void About() {//draw the about page
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 
@@ -95,7 +96,7 @@ void About() {
 
 }
 
-void Guide() {
+void Guide() {//draw the guide page
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 

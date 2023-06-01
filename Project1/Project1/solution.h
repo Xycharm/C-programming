@@ -1,18 +1,18 @@
 #ifndef solution
 #define solution
-#define N_list 9
+#define N_list 9 //capacity of nodes[]
 typedef struct visits_node {
     int i;
     int j;
     struct visits_node *next;
-} Node;
+} Node;//linked list node
 extern Node *nodes[N_list];
 extern struct visits_node *Head[N_list];
 extern int count;
 extern int soFar;
 extern int visit[X][X];
 extern int shown_count;
-extern int lengths[X * X];
+extern int lengths[N_list];
 extern int play;
 extern int lock_change;
 extern Node *path;

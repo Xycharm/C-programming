@@ -2,21 +2,21 @@
 #include"solution.h"
 
 int blockState[X][X];//record the states of blocks
-int visit[X][X];
-Node *nodes[N_list] = {NULL};
-Node *path;
-struct visits_node *Head[N_list] = {NULL};
-int lengths[X * X];
-int soFar, count;
-int shown_count;
+int visit[X][X];//record whether a block has been visited
+Node *nodes[N_list] = {NULL};//store the linked list of nodes as paths that arrive at the destination
+Node *path;//store the linked list of nodes as the path of exploration
+int lengths[N_list];//store the lengths of paths
+int count;//the number of paths
 struct Agent agent = {1, 1};//the position of agent
-
 int lock_change = 1;//whether being able to change the map
 int play = 0;//whether the agent is able to move
 char *colors[] = {"White", "Black", "Red", "Yellow", "Green"};//store the color strings
 
 
 void InitGame() {
+    //initialize the game, including the map and the agent
+    //use randomDFS to generate a random map
+
     play = 0;
     srand((unsigned) time(NULL));
     int i, j;
@@ -27,12 +27,16 @@ void InitGame() {
     }
     blockState[1][1] = START;
     blockState[X - 2][X - 2] = DEST;
+    //set the start and the destination
     randomDFS(1, 1);
     agent.i = 1;
     agent.j = 1;
 }
 
 void block_display() {
+    //display the blocks
+
+
     DisplayClear();
     lock(lock_change);//show the lock icon
     int i = 0, j = 0;
@@ -46,13 +50,11 @@ void block_display() {
     colorBlock(RED, agent.i, agent.j);
 }
 
-void Display() {//(re)display the changes
-//redraw the menu bar
+void Display() {
+    //redraw the menu bar and realize the function of the menu bar
 
-    int i = 0;
-    double ww = GetWindowWidth();
-    double wh = GetWindowHeight();
 
+    //menu list
     static char *menuListFile[] = {"File",
                                    "New",
                                    "Open | Ctrl-VK_F5",
@@ -72,7 +74,9 @@ void Display() {//(re)display the changes
                                    "How to play",
                                    "About"};
     static char *selectedLabel = NULL;
-
+    //menu size and position and other attributes
+    double ww = GetWindowWidth();
+    double wh = GetWindowHeight();
     double fH = GetFontHeight();
     double x = 0; //fH/8;
     double y = wh;
@@ -83,31 +87,39 @@ void Display() {//(re)display the changes
     int selection;
     bool enable_rotation = 1;
     bool show_more_buttons = 1;
-
+    //draw the menu bar
     drawMenuBar(0, y - h, ww, h);
+
+
     //File
     selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListFile,
                          sizeof(menuListFile) / sizeof(menuListFile[0]));
-    if (selection > 0) selectedLabel = menuListFile[selection];
-    if (selection == 4) {
+    if (selection > 0) selectedLabel = menuListFile[selection];//get the selected label
+    if (selection == 4) {//exit
         free_node();
         free_path();
         exit(0); // choose to exit
 
-    } else if (selection == 3) {
+    } else if (selection == 3) {//save
         SaveMap();
-    } else if (selection == 2) {
+        Display();
+    } else if (selection == 2) {//open
         LoadMap();
         block_display();
-    } else if (selection == 1) {
+        Display();
+    } else if (selection == 1) {//new
         ClearMaze();
         block_display();
+        Display();
     }
+
+
+
     //Edit the map
     selection = menuList(GenUIID(0), x + w, y - h, w, wlist, h, menuListMazeEdit,
                          sizeof(menuListMazeEdit) / sizeof(menuListMazeEdit[0]));
-    if (selection > 0) selectedLabel = menuListMazeEdit[selection];
-    if (selection == 3) {
+    if (selection > 0) selectedLabel = menuListMazeEdit[selection];//get the selected label
+    if (selection == 3) {//clear and edit
         if (lock_change == 1) {//clear and edit
             agent.i = 1;
             agent.j = 1;
@@ -139,44 +151,50 @@ void Display() {//(re)display the changes
         block_display();
         lock_change = 1;
     }
+
+
+
     //Solve
     selection = menuList(GenUIID(0), x + 2 * w, y - h, w, wlist, h, menuListMazeSolve,
                          sizeof(menuListMazeSolve) / sizeof(menuListMazeSolve[0]));
     if (selection > 0) selectedLabel = menuListMazeSolve[selection];
-    if(lock_change==1){    if (selection == 2) {
+    if (lock_change == 1) {
+        if (selection == 2) {//auto
             callsolve(agent.i, agent.j);
             startTimer(0, 500);
             block_display();
             Display();
             play = 0;
-        } else if (selection == 1) {
+        } else if (selection == 1) {//by hand
             play = 1;
-        } else if (selection == 3) {
+        } else if (selection == 3) {//optimal
             callsolve(agent.i, agent.j);
             traverse_linkedlist(shortest_index());
-        } else if (selection == 4) {
-            //single step
+        } else if (selection == 4) {//single step
             callsolve(agent.i, agent.j);
             if (nodes[shortest_index()]->next != NULL) {
                 agent.i = nodes[shortest_index()]->next->i;
                 agent.j = nodes[shortest_index()]->next->j;
-            }
+            }//move to the next node on the shortest path
             block_display();
             Display();
 
-        } else if (selection == 5) {
+        } else if (selection == 5) {//explore
             callsolve(agent.i, agent.j);
-            path_();}
+            path_();
+        }
 
 
     }
+
+
     //Help
     selection = menuList(GenUIID(0), x + 3 * w, y - h, w, wlist, h, menuListHelp,
                          sizeof(menuListHelp) / sizeof(menuListHelp[0]));
     if (selection > 0) selectedLabel = menuListHelp[selection];
-    if (selection == 2) {
+    if (selection == 2) {//about
         About();
-    } else if (selection == 1) {
+    } else if (selection == 1) {// how to play
         Guide();
     }
 
@@ -194,7 +212,7 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     agent.j = 1;
                     play = 0;
                     if (lock_change == 1) {
-                        ClearMaze();//To DO :the surrounding barriers
+                        ClearMaze();
                         Display();
                         lock_change = 0;
                         lock(lock_change);
@@ -230,7 +248,7 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     LoadMap();
                     Display();
                     break;
-                case VK_F6:
+                case VK_F6://Guide
                     Guide();
                     break;
                 case VK_F12://exit
@@ -238,35 +256,35 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     free_path();
                     exit(0);
                     break;
-                case VK_UP:
+                case VK_UP://move up
                     if (play == 0)break;
                     if (check(agent.i + 1, agent.j) != 1)
                         agent.i++;
                     block_display();
                     Display();
                     break;
-                case VK_DOWN:
+                case VK_DOWN://move down
                     if (play == 0)break;
                     if (check(agent.i - 1, agent.j) != 1)
                         agent.i--;
                     block_display();
                     Display();
                     break;
-                case VK_LEFT:
+                case VK_LEFT://move left
                     if (play == 0)break;
                     if (check(agent.i, agent.j - 1) != 1)
                         agent.j--;
                     block_display();
                     Display();
                     break;
-                case VK_RIGHT:
+                case VK_RIGHT://move right
                     if (play == 0)break;
                     if (check(agent.i, agent.j + 1) != 1)
                         agent.j++;
                     block_display();
                     Display();
                     break;
-                case VK_F7:
+                case VK_F7://auto
                     if (lock_change == 1) {
                         callsolve(agent.i, agent.j);
                         startTimer(0, 500);
@@ -275,14 +293,14 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     }
 
                     break;
-                case VK_F8:
+                case VK_F8://optimal
                     if (lock_change == 1) {
                         callsolve(agent.i, agent.j);
                         traverse_linkedlist(shortest_index());
                     }
 
                     break;
-                case VK_F9:
+                case VK_F9://single step
                     if (lock_change == 1) {
                         callsolve(agent.i, agent.j);
                         if (nodes[shortest_index()]->next != NULL) {
@@ -294,7 +312,7 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     block_display();
                     Display();
                     break;
-                case 'S':
+                case 'S'://explore
                     if (lock_change == 1) {
                         callsolve(agent.i, agent.j);
                         path_();
@@ -310,9 +328,9 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
     Display();
 }
 
-void TimerEventProcess(int timerID) {
+void TimerEventProcess(int timerID) {//Timer
     static int time = 0;
-    if (timerID == 0) {
+    if (timerID == 0) {//visualize all the paths
         block_display();
         traverse_linkedlist(time);
         Display();
@@ -322,7 +340,7 @@ void TimerEventProcess(int timerID) {
             time = 0;
         }
     }
-    if (timerID == -1) {
+    if (timerID == -1) {//visualize  explore path
         block_display();
         if (path != NULL) {
             colorBlock(RED, path->i, path->j);
@@ -337,13 +355,13 @@ void TimerEventProcess(int timerID) {
     }
 }
 
-void MouseEventProcess(int x, int y, int button, int event) {
+void MouseEventProcess(int x, int y, int button, int event) {//Mouse
     win_judge();
     uiGetMouse(x, y, button, event);
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight();
     double blockL = windowWidth / X;
-
+    //click the block
     if (button == LEFT_BUTTON && event == BUTTON_DOWN) {
 
         int i, j;
