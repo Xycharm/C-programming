@@ -1,5 +1,6 @@
 #ifndef macro
 #define macro
+
 #include "libgraphics\graphics.h"
 #include "libgraphics\extgraph.h"
 #include "libgraphics\genlib.h"
@@ -21,7 +22,9 @@
 #include <winuser.h>
 #include "libgraphics\linkedlist.h"
 #include "libgraphics\random.h"
-#define X 21
+#include <time.h>
+
+#define X 31
 #define NVISIT 99
 //must be odd
 #define  VACANT  0
@@ -31,8 +34,31 @@
 #define   START  4
 extern char* colors[];
 extern int blockState[X][X];
+
 void Barrier();
+
 void colorBlock(int color, int x, int y);
+
+void About();
+
+void Guide();
+
+void LoadMap();
+
+void SaveMap();
+
+int check(int i, int j);
+
+int direction_feasible(int i, int j);
+
+int direction_judge(int i, int j, int dir);
+
+void randomDFS(int i, int j);
+
+void lock(int lock_change);
+
+void Display();
+
 #endif // !macro
 
 

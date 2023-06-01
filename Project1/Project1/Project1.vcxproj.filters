@@ -53,12 +53,6 @@
     <ClInclude Include="solution.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="file.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="menu.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
