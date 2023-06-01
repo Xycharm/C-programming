@@ -99,28 +99,6 @@ Node* copy_linkedlist(Node* source, Node* target) {
     }
     return target;
 }
-//void solve(int i, int j) {
-//    visit[i][j] = 1;
-//    nodes[count]=add_node(nodes[count], i, j);
-//    if (i == X - 2 && j == X - 2 && count < N_list) {
-//
-//        count++;
-//        nodes[count] = copy_linkedlist(nodes[count - 1], nodes[count]);
-//    }
-//    int di[] = { 0,0,1,-1 };
-//    int dj[] = { 1,-1,0,0 };
-//    int k;
-//    for (k = 0; k < 4; k++) {
-//        int _i = i + di[k];
-//        int _j = j + dj[k];
-//        if ((blockState[_i][_j] == VACANT || blockState[_i][_j] == DEST) && visit[_i][_j] == 0) {
-//            solve(_i, _j);
-//        }
-//    }
-//    visit[i][j] = 0;
-//    nodes[count] = delete_node(nodes[count], i, j);
-//
-//}
 void free_node(){
     int i = 0;
     //free all linked list node[]
@@ -204,7 +182,6 @@ void solve(int i, int j) {
         linklist_length(nodes[count]);
         count++;
         nodes[count] = copy_linkedlist(nodes[count - 1], nodes[count]);
-        return;//maybe bug??
     }
     int di[] = { 0,0,1,-1 };
     int dj[] = { 1,-1,0,0 };
@@ -219,56 +196,4 @@ void solve(int i, int j) {
     visit[i][j] = 0;
     nodes[count] = delete_node(nodes[count], i, j);
 
-}
-
-void visualize() {
-    if (count == 0) {
-        double ww = GetWindowWidth();
-        double wh = GetWindowHeight();
-
-        double cx = ww / 2;
-        double cy = wh / 2;
-        double len = ww / 1.6;
-        MovePen(cx - len / 2, cy - len / 2);
-        SetPenColor("White");
-        StartFilledRegion(1);
-        DrawLine(0, len);
-        DrawLine(len, 0);
-        DrawLine(0, -len);
-        DrawLine(-len, 0);
-        EndFilledRegion();
-
-        MovePen(cx - len / 2, cy - len / 2);
-        SetPenColor("Black");
-        DrawLine(0, len);
-        DrawLine(len, 0);
-        DrawLine(0, -len);
-        DrawLine(-len, 0);
-
-        char *str = "No valid path!";
-        double fontAscent = GetFontAscent();
-        double tw = TextStringWidth(str);
-        MovePen(cx - tw / 2, cy - fontAscent / 2);
-        SetPenColor("Black");
-        DrawTextString(str);
-
-        return;
-    }
-    Display();
-    if (shown_count > count) {
-        shown_count = 1;
-    }
-    while (shown_count <= count && lengths[shown_count] > soFar)
-        shown_count++;
-    printf("%d/%d\n", shown_count, count);
-    int j;
-    struct visits_node *p = NULL;
-    p = Head[shown_count];
-    for (j = 0; j < soFar; j++) {
-        printf("%d,%d->", p->i, p->j);
-        colorBlock(RED, p->i, p->j);
-        p = p->next;
-    }
-    printf("\n");
-    shown_count++;
 }

@@ -2,7 +2,6 @@
 #include"solution.h"
 
 int blockState[X][X];//record the states of blocks
-
 int visit[X][X];
 Node *nodes[N_list] = {NULL};
 Node *path;
@@ -91,16 +90,8 @@ void Display() {//(re)display the changes
                          sizeof(menuListFile) / sizeof(menuListFile[0]));
     if (selection > 0) selectedLabel = menuListFile[selection];
     if (selection == 4) {
-        i = 1;
-        while (Head[i]) {
-            while (Head[i]) {
-                struct visits_node *node;
-                node = Head[i]->next;
-                free(Head[i]);
-                Head[i] = node;
-            }
-            i++;
-        }
+        free_node();
+        free_path();
         exit(0); // choose to exit
 
     } else if (selection == 3) {
@@ -152,30 +143,31 @@ void Display() {//(re)display the changes
     selection = menuList(GenUIID(0), x + 2 * w, y - h, w, wlist, h, menuListMazeSolve,
                          sizeof(menuListMazeSolve) / sizeof(menuListMazeSolve[0]));
     if (selection > 0) selectedLabel = menuListMazeSolve[selection];
-    if (selection == 2) {
-        callsolve(agent.i, agent.j);
-        startTimer(0, 500);
-        block_display();
-        Display();
-        play = 0;
-    } else if (selection == 1) {
-        play = 1;
-    } else if (selection == 3) {
-        callsolve(agent.i, agent.j);
-        traverse_linkedlist(shortest_index());
-    } else if (selection == 4) {
-        //single step
-        callsolve(agent.i, agent.j);
-        if (nodes[shortest_index()]->next != NULL) {
-            agent.i = nodes[shortest_index()]->next->i;
-            agent.j = nodes[shortest_index()]->next->j;
-        }
-        block_display();
-        Display();
+    if(lock_change==1){    if (selection == 2) {
+            callsolve(agent.i, agent.j);
+            startTimer(0, 500);
+            block_display();
+            Display();
+            play = 0;
+        } else if (selection == 1) {
+            play = 1;
+        } else if (selection == 3) {
+            callsolve(agent.i, agent.j);
+            traverse_linkedlist(shortest_index());
+        } else if (selection == 4) {
+            //single step
+            callsolve(agent.i, agent.j);
+            if (nodes[shortest_index()]->next != NULL) {
+                agent.i = nodes[shortest_index()]->next->i;
+                agent.j = nodes[shortest_index()]->next->j;
+            }
+            block_display();
+            Display();
 
-    } else if (selection == 5) {
-        callsolve(agent.i, agent.j);
-        path_();
+        } else if (selection == 5) {
+            callsolve(agent.i, agent.j);
+            path_();}
+
 
     }
     //Help
@@ -242,16 +234,8 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     Guide();
                     break;
                 case VK_F12://exit
-                    i = 1;
-                    while (Head[i]) {
-                        while (Head[i]) {
-                            struct visits_node *node;
-                            node = Head[i]->next;
-                            free(Head[i]);
-                            Head[i] = node;
-                        }
-                        i++;
-                    }
+                    free_node();
+                    free_path();
                     exit(0);
                     break;
                 case VK_UP:
@@ -283,28 +267,40 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     Display();
                     break;
                 case VK_F7:
-                    callsolve(agent.i, agent.j);
-                    startTimer(0, 500);
-                    block_display();
-                    Display();
+                    if (lock_change == 1) {
+                        callsolve(agent.i, agent.j);
+                        startTimer(0, 500);
+                        block_display();
+                        Display();
+                    }
+
                     break;
                 case VK_F8:
-                    callsolve(agent.i, agent.j);
-                    traverse_linkedlist(shortest_index());
+                    if (lock_change == 1) {
+                        callsolve(agent.i, agent.j);
+                        traverse_linkedlist(shortest_index());
+                    }
+
                     break;
                 case VK_F9:
-                    callsolve(agent.i, agent.j);
-                    if (nodes[shortest_index()]->next != NULL) {
-                        agent.i = nodes[shortest_index()]->next->i;
-                        agent.j = nodes[shortest_index()]->next->j;
+                    if (lock_change == 1) {
+                        callsolve(agent.i, agent.j);
+                        if (nodes[shortest_index()]->next != NULL) {
+                            agent.i = nodes[shortest_index()]->next->i;
+                            agent.j = nodes[shortest_index()]->next->j;
+                        }
                     }
+
                     block_display();
                     Display();
                     break;
                 case 'S':
-                    callsolve(agent.i, agent.j);
-                    path_();
-                    break;
+                    if (lock_change == 1) {
+                        callsolve(agent.i, agent.j);
+                        path_();
+                        break;
+                    }
+
             }
             break;
         case KEY_UP:

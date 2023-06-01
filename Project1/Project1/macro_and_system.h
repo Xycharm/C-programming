@@ -1,6 +1,6 @@
 #ifndef macro
 #define macro
-
+//system & graphics libraries
 #include "libgraphics\graphics.h"
 #include "libgraphics\extgraph.h"
 #include "libgraphics\genlib.h"
@@ -24,8 +24,9 @@
 #include "libgraphics\random.h"
 #include <time.h>
 
-#define X 45
+#define X 45 //number of blocks in a row/column
 //must be odd
+//define the state(color) of a block
 #define  VACANT  0
 #define BARRIER  1
 #define     RED  2
@@ -33,11 +34,12 @@
 #define   START  4
 extern char *colors[];
 extern int blockState[X][X];
-struct Agent{
+struct Agent {
     int i;
     int j;
-};//extern a structure?????
+};
 extern struct Agent agent;
+
 void Barrier();
 
 void colorBlock(int color, int x, int y);
@@ -61,8 +63,11 @@ void randomDFS(int i, int j);
 void lock(int lock_change);
 
 void Display();
+
 void block_display();
-void subtitle(char* title);
+
+void subtitle(char *title);
+
 void InitGame();
 
 
