@@ -24,7 +24,7 @@
 #include "libgraphics\random.h"
 #include <time.h>
 
-#define X 15
+#define X 45
 //must be odd
 #define  VACANT  0
 #define BARRIER  1

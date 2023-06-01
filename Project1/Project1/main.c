@@ -67,7 +67,8 @@ void Display() {//(re)display the changes
                                         "Manually",
                                         "Automatically | Ctrl-VK_F7",
                                         "Optimal | Ctrl-VK_F8",
-                                        "Single Step | Ctrl-VK_F9"};
+                                        "Single Step | Ctrl-VK_F9",
+                                        "Explore paths | Ctrl-VK_F10"};
     static char *menuListHelp[] = {"Help",
                                    "How to play",
                                    "About"};
@@ -162,7 +163,7 @@ void Display() {//(re)display the changes
     } else if (selection == 3) {
         callsolve(agent.i, agent.j);
         traverse_linkedlist(shortest_index());
-    } else if(selection==4){
+    } else if (selection == 4) {
         //single step
         callsolve(agent.i, agent.j);
         if (nodes[shortest_index()]->next != NULL) {
@@ -171,6 +172,10 @@ void Display() {//(re)display the changes
         }
         block_display();
         Display();
+
+    } else if (selection == 5) {
+        callsolve(agent.i, agent.j);
+        path_();
 
     }
     //Help
@@ -321,12 +326,12 @@ void TimerEventProcess(int timerID) {
             time = 0;
         }
     }
-    if(timerID == -1){
+    if (timerID == -1) {
         block_display();
-        if(path!=NULL){
-        colorBlock(RED,path->i, path->j);
-        path = path->next;
-        }else{
+        if (path != NULL) {
+            colorBlock(RED, path->i, path->j);
+            path = path->next;
+        } else {
             cancelTimer(-1);
         }
 
