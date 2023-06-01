@@ -24,7 +24,7 @@
 #include "libgraphics\random.h"
 #include <time.h>
 
-#define X 13
+#define X 15
 //must be odd
 #define  VACANT  0
 #define BARRIER  1
@@ -62,6 +62,9 @@ void lock(int lock_change);
 
 void Display();
 void block_display();
+void subtitle(char* title);
+void InitGame();
+
 
 #endif // !macro
 

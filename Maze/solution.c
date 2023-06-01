@@ -19,7 +19,18 @@ Node* add_node(Node* head, int i, int j) {
     q->next = p;
     return head;
 }
-
+void win_judge(){
+    if(agent.i==X-2&&agent.j==X-2) {
+        subtitle("win!win!win!!!\nnew game will be started");
+//        startTimer(1, 5000);
+        agent.i = 1;
+        agent.j = 1;
+        play = 0;
+        InitGame();
+        Display();
+        lock_change = 1;
+    }
+}
 void print_linkedlist() {
     int i;
     for (i = 0; i < count; i++) {
@@ -31,8 +42,24 @@ void print_linkedlist() {
         printf("length=%d\n",lengths[i]);
     }
 }
-void traverse_linkedlist(int _count) {
+void path_() {
+    //print path
+    Node *p = path;
+    while (p != NULL) {
+        printf("(%d,%d)", p->i, p->j);
+        p = p->next;
+    }
+    printf("\ntry and error\n");
+    startTimer(-1, 100);
+}
 
+
+void traverse_linkedlist(int _count) {
+    if (count == 0) {
+        subtitle("no solution");
+
+        return;
+    }
 
         Node* p = nodes[_count];
         while (p != NULL) {
@@ -107,6 +134,15 @@ void free_node(){
         nodes[i] = NULL;
     }
 }
+void free_path(){
+    Node* p = path;
+    while (p != NULL) {
+        Node* q = p;
+        p = p->next;
+        free(q);
+    }
+    path = NULL;
+}
 int shortest_index(){
     int i = 0;
     int min = lengths[0];
@@ -121,6 +157,7 @@ int shortest_index(){
 }
 void callsolve(int I,int J) {
     free_node();
+    free_path();
     count = 0;
     solve(I, J);
     print_linkedlist();
@@ -136,7 +173,31 @@ int i = 0;
     lengths[count] = i;
 
 }
+//void solve_visual(int i,int j){
+//    path=add_node(path,i,j);
+//    visit[i][j] = 1;
+//    nodes[count]=add_node(nodes[count], i, j);
+//    if (i == X - 2 && j == X - 2 && count < N_list) {
+//        linklist_length(nodes[count]);
+//        count++;
+//        nodes[count] = copy_linkedlist(nodes[count - 1], nodes[count]);
+//    }
+//    int di[] = { 0,0,1,-1 };
+//    int dj[] = { 1,-1,0,0 };
+//    int k;
+//    for (k = 0; k < 4; k++) {
+//        int _i = i + di[k];
+//        int _j = j + dj[k];
+//        if ((blockState[_i][_j] == VACANT || blockState[_i][_j] == DEST) && visit[_i][_j] == 0) {
+//            solve(_i, _j);
+//        }
+//    }
+//    visit[i][j] = 0;
+//    nodes[count] = delete_node(nodes[count], i, j);
+//}
+
 void solve(int i, int j) {
+    path=add_node(path,i,j);
     visit[i][j] = 1;
     nodes[count]=add_node(nodes[count], i, j);
     if (i == X - 2 && j == X - 2 && count < N_list) {

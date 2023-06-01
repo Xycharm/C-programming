@@ -1,9 +1,11 @@
 #include"macro_and_system.h"
 #include"solution.h"
+
 int blockState[X][X];//record the states of blocks
 
 int visit[X][X];
-Node* nodes[N_list]={NULL};
+Node *nodes[N_list] = {NULL};
+Node *path;
 struct visits_node *Head[N_list] = {NULL};
 int lengths[X * X];
 int soFar, count;
@@ -30,7 +32,8 @@ void InitGame() {
     agent.i = 1;
     agent.j = 1;
 }
-void block_display(){
+
+void block_display() {
     DisplayClear();
     lock(lock_change);//show the lock icon
     int i = 0, j = 0;
@@ -63,7 +66,8 @@ void Display() {//(re)display the changes
     static char *menuListMazeSolve[] = {"Solve",
                                         "Manually",
                                         "Automatically | Ctrl-VK_F7",
-                                        "Optimal | Ctrl-VK_F8",};
+                                        "Optimal | Ctrl-VK_F8",
+                                        "Single Step | Ctrl-VK_F9"};
     static char *menuListHelp[] = {"Help",
                                    "How to play",
                                    "About"};
@@ -113,8 +117,9 @@ void Display() {//(re)display the changes
     if (selection > 0) selectedLabel = menuListMazeEdit[selection];
     if (selection == 3) {
         if (lock_change == 1) {//clear and edit
-            agent.i=1;agent.j=1;
-            play=0;
+            agent.i = 1;
+            agent.j = 1;
+            play = 0;
             ClearMaze();
             block_display();
             lock_change = 0;
@@ -124,8 +129,9 @@ void Display() {//(re)display the changes
             lock(lock_change);
         }
     } else if (selection == 1) {//by hand
-        agent.i=1;agent.j=1;
-        play=0;
+        agent.i = 1;
+        agent.j = 1;
+        play = 0;
         if (lock_change == 1) {
             lock_change = 0;
             lock(lock_change);
@@ -134,8 +140,9 @@ void Display() {//(re)display the changes
             lock(lock_change);
         }
     } else if (selection == 2) {//regenerate
-        agent.i=1;agent.j=1;
-        play=0;
+        agent.i = 1;
+        agent.j = 1;
+        play = 0;
         InitGame();
         block_display();
         lock_change = 1;
@@ -145,16 +152,26 @@ void Display() {//(re)display the changes
                          sizeof(menuListMazeSolve) / sizeof(menuListMazeSolve[0]));
     if (selection > 0) selectedLabel = menuListMazeSolve[selection];
     if (selection == 2) {
-        callsolve(1,1);
-        startTimer(0,500);
+        callsolve(agent.i, agent.j);
+        startTimer(0, 500);
         block_display();
         Display();
         play = 0;
     } else if (selection == 1) {
         play = 1;
-    } else if (selection == 3){
-        callsolve(1,1);
+    } else if (selection == 3) {
+        callsolve(agent.i, agent.j);
         traverse_linkedlist(shortest_index());
+    } else if(selection==4){
+        //single step
+        callsolve(agent.i, agent.j);
+        if (nodes[shortest_index()]->next != NULL) {
+            agent.i = nodes[shortest_index()]->next->i;
+            agent.j = nodes[shortest_index()]->next->j;
+        }
+        block_display();
+        Display();
+
     }
     //Help
     selection = menuList(GenUIID(0), x + 3 * w, y - h, w, wlist, h, menuListHelp,
@@ -169,14 +186,16 @@ void Display() {//(re)display the changes
 }
 
 void KeyboardEventProcess(int key, int event) {//Keyboard
+    win_judge();
     uiGetKeyboard(key, event);
     int i;
     switch (event) {
         case KEY_DOWN:
             switch (key) {
                 case VK_F1: //clear and edit
-                    agent.i=1;agent.j=1;
-                    play=0;
+                    agent.i = 1;
+                    agent.j = 1;
+                    play = 0;
                     if (lock_change == 1) {
                         ClearMaze();//To DO :the surrounding barriers
                         Display();
@@ -185,21 +204,20 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     } else {
                         lock_change = 1;
                         lock(lock_change);
-                        callsolve(agent.i,agent.j);
                     }
                     break;
                 case VK_F2://regenerate
-                    agent.i=1;agent.j=1;
-                    play=0;
+                    agent.i = 1;
+                    agent.j = 1;
+                    play = 0;
                     InitGame();
                     Display();
-                    callsolve(agent.i,agent.j);
                     lock_change = 1;
                     break;
                 case VK_F3:    //edit on the existing map
-                    agent.i=1;
-                    agent.j=1;
-                    play=0;
+                    agent.i = 1;
+                    agent.j = 1;
+                    play = 0;
                     if (lock_change == 1) {
                         lock_change = 0;
                         lock(lock_change);
@@ -235,38 +253,53 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     if (play == 0)break;
                     if (check(agent.i + 1, agent.j) != 1)
                         agent.i++;
+                    block_display();
                     Display();
                     break;
                 case VK_DOWN:
                     if (play == 0)break;
                     if (check(agent.i - 1, agent.j) != 1)
                         agent.i--;
+                    block_display();
                     Display();
                     break;
                 case VK_LEFT:
                     if (play == 0)break;
                     if (check(agent.i, agent.j - 1) != 1)
                         agent.j--;
+                    block_display();
                     Display();
                     break;
                 case VK_RIGHT:
                     if (play == 0)break;
                     if (check(agent.i, agent.j + 1) != 1)
                         agent.j++;
+                    block_display();
                     Display();
                     break;
                 case VK_F7:
-                    callsolve(1,1);
-                    startTimer(0,500);
+                    callsolve(agent.i, agent.j);
+                    startTimer(0, 500);
                     block_display();
                     Display();
                     break;
                 case VK_F8:
-                    callsolve(1,1);
+                    callsolve(agent.i, agent.j);
                     traverse_linkedlist(shortest_index());
                     break;
-
-
+                case VK_F9:
+                    callsolve(agent.i, agent.j);
+                    if (nodes[shortest_index()]->next != NULL) {
+                        agent.i = nodes[shortest_index()]->next->i;
+                        agent.j = nodes[shortest_index()]->next->j;
+                    }
+                    block_display();
+                    Display();
+                    break;
+                case 'S':
+                    callsolve(agent.i, agent.j);
+                    path_();
+                    break;
             }
             break;
         case KEY_UP:
@@ -275,20 +308,36 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
     }
     Display();
 }
-void TimerEventProcess(int timerID){
-    static int time=0;
-    if(timerID==0){
+
+void TimerEventProcess(int timerID) {
+    static int time = 0;
+    if (timerID == 0) {
         block_display();
         traverse_linkedlist(time);
         Display();
         time++;
-        if(time>=count){
+        if (time >= count) {
             cancelTimer(0);
-            time=0;
+            time = 0;
         }
     }
+    if(timerID == -1){
+        block_display();
+        if(path!=NULL){
+        colorBlock(RED,path->i, path->j);
+        path = path->next;
+        }else{
+            cancelTimer(-1);
+        }
+
+        printf("end\n");
+        Display();
+
+    }
 }
+
 void MouseEventProcess(int x, int y, int button, int event) {
+    win_judge();
     uiGetMouse(x, y, button, event);
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight();
@@ -300,8 +349,8 @@ void MouseEventProcess(int x, int y, int button, int event) {
         int curCoordinateI = -1, curCoordinateJ = -1;
         double xx = ScaleXInches(x);
         double yy = ScaleYInches(y);
-        for (i = 1; i < X-1; i++) {
-            for (j = 1; j < X-1; j++) {
+        for (i = 1; i < X - 1; i++) {
+            for (j = 1; j < X - 1; j++) {
                 double pi = i * blockL;
                 double pj = j * blockL;
                 if (xx > pj && xx < pj + blockL && yy > pi && yy < pi + blockL) {

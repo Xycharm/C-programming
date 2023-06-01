@@ -1,4 +1,36 @@
 #include"macro_and_system.h"
+void subtitle(char* title){
+double ww = GetWindowWidth();
+double wh = GetWindowHeight();
+
+double cx = ww / 2;
+double cy = wh / 2;
+double len = ww / 1.6;
+MovePen(cx - len / 2, cy - len / 2);
+SetPenColor("White");
+StartFilledRegion(1);
+DrawLine(0, len);
+DrawLine(len, 0);
+DrawLine(0, -len);
+DrawLine(-len, 0);
+EndFilledRegion();
+
+MovePen(cx - len / 2, cy - len / 2);
+SetPenColor("Black");
+DrawLine(0, len);
+DrawLine(len, 0);
+DrawLine(0, -len);
+DrawLine(-len, 0);
+
+char *str = title;
+double fontAscent = GetFontAscent();
+double tw = TextStringWidth(str);
+MovePen(cx - tw / 2, cy - fontAscent / 2);
+SetPenColor("Black");
+DrawTextString(str);
+
+}
+
 
 void About() {
     double ww = GetWindowWidth();

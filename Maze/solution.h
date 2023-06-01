@@ -13,15 +13,17 @@ extern int soFar;
 extern int visit[X][X];
 extern int shown_count;
 extern int lengths[X * X];
-
+extern int play;
+extern int lock_change;
+extern Node* path;
 void callsolve(int I,int J);
 
 void solve(int i,int j);
 
 void visualize();
-
+void path_();
 void ClearMaze();
-
+void win_judge();
 void free_node();
 int shortest_index();
 void print_linkedlist();
