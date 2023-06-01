@@ -204,6 +204,7 @@ void solve(int i, int j) {
         linklist_length(nodes[count]);
         count++;
         nodes[count] = copy_linkedlist(nodes[count - 1], nodes[count]);
+        return;//maybe bug??
     }
     int di[] = { 0,0,1,-1 };
     int dj[] = { 1,-1,0,0 };
