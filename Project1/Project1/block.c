@@ -52,26 +52,28 @@ void ClearMaze() {
         blockState[0][i] = BARRIER;
         blockState[X - 1][i] = BARRIER;
     }
+    agent.i=1;
+    agent.j=1;
 
 
 }
-
+/*draw the 'lock' icon*/
 void lock(int lock_change) {
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
     double fH = GetFontHeight();
     double x = 0; //fH/8;
     double y = wh;
-    double h = fH * 1.5; // controler height
-    double w = ww / 4; // controler width
-    char* str1 = "locked";
-    char* str2 = "unlocked";
+    double h = fH * 1.5; // controller height
+    double w = ww / 4; // controller width
+    char *str1 = "locked";
+    char *str2 = "unlocked";
     double fontAscent = GetFontAscent();
     double tw = TextStringWidth(str2);
     double len = tw + 1;
 
     if (lock_change) {
-        MovePen(x, y - h * 2);
+        MovePen(x, y - h*2 );
         SetPenColor("Blue");
         StartFilledRegion(1);
         DrawLine(0, h);
@@ -84,9 +86,8 @@ void lock(int lock_change) {
         SetPenColor("Black");
         DrawTextString(str1);
 
-    }
-    else {
-        MovePen(x, y - h * 2);
+    } else {
+        MovePen(x, y - h *2);
         SetPenColor("Blue");
         StartFilledRegion(1);
         DrawLine(0, h);

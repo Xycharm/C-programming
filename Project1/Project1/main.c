@@ -1,30 +1,23 @@
 #include"macro_and_system.h"
 #include"solution.h"
-
-#define N_list 999
-//TODO: change into structure  ; outer surrounding unchangable: array use structure
-
 int blockState[X][X];//record the states of blocks
 
 int visit[X][X];
-
-struct visits_node* Head[99] = { NULL };
+Node* nodes[N_list]={NULL};
+struct visits_node *Head[N_list] = {NULL};
 int lengths[X * X];
 int soFar, count;
 int shown_count;
-struct {
-    int i;
-    int j;
-} agent = { 1, 1 };//the position of agent
+struct Agent agent = {1, 1};//the position of agent
 
 int lock_change = 1;//whether being able to change the map
-int play = 0;
-char* colors[] = { "White", "Black", "Red", "Yellow", "Green" };//store the color strings
+int play = 0;//whether the agent is able to move
+char *colors[] = {"White", "Black", "Red", "Yellow", "Green"};//store the color strings
 
 
 void InitGame() {
     play = 0;
-    srand((unsigned)time(NULL));
+    srand((unsigned) time(NULL));
     int i, j;
     for (i = 0; i < X; i++) {
         for (j = 0; j < X; j++) {
@@ -37,10 +30,9 @@ void InitGame() {
     agent.i = 1;
     agent.j = 1;
 }
-
-void Display() {//(re)display the changes
+void block_display(){
     DisplayClear();
-    lock(lock_change);
+    lock(lock_change);//show the lock icon
     int i = 0, j = 0;
     Barrier();
     for (i = 0; i < X; i++) {
@@ -50,26 +42,32 @@ void Display() {//(re)display the changes
     }
 
     colorBlock(RED, agent.i, agent.j);
+}
 
+void Display() {//(re)display the changes
+//redraw the menu bar
+
+    int i = 0;
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 
-    static char* menuListFile[] = { "File",
+    static char *menuListFile[] = {"File",
                                    "New",
                                    "Open | Ctrl-VK_F5",
                                    "Save | Ctrl-VK_F4",
-                                   "Exit | Ctrl-VK_F12" };
-    static char* menuListMazeEdit[] = { "Edit the map",
+                                   "Exit | Ctrl-VK_F12"};
+    static char *menuListMazeEdit[] = {"Edit the map",
                                        "Edit manually | Ctrl-VK_F3",
                                        "Regenerate | Ctrl-VK_F2",
-                                       "Clear and edit | Ctrl-VK_F1" };
-    static char* menuListMazeSolve[] = { "Solve",
+                                       "Clear and edit | Ctrl-VK_F1"};
+    static char *menuListMazeSolve[] = {"Solve",
                                         "Manually",
-                                        "Automatically | Ctrl-VK_F7" };
-    static char* menuListHelp[] = { "Help",
+                                        "Automatically | Ctrl-VK_F7",
+                                        "Optimal | Ctrl-VK_F8",};
+    static char *menuListHelp[] = {"Help",
                                    "How to play",
-                                   "About" };
-    static char* selectedLabel = NULL;
+                                   "About"};
+    static char *selectedLabel = NULL;
 
     double fH = GetFontHeight();
     double x = 0; //fH/8;
@@ -85,13 +83,13 @@ void Display() {//(re)display the changes
     drawMenuBar(0, y - h, ww, h);
     //File
     selection = menuList(GenUIID(0), x, y - h, w, wlist, h, menuListFile,
-        sizeof(menuListFile) / sizeof(menuListFile[0]));
+                         sizeof(menuListFile) / sizeof(menuListFile[0]));
     if (selection > 0) selectedLabel = menuListFile[selection];
     if (selection == 4) {
         i = 1;
         while (Head[i]) {
             while (Head[i]) {
-                struct visits_node* node;
+                struct visits_node *node;
                 node = Head[i]->next;
                 free(Head[i]);
                 Head[i] = node;
@@ -100,72 +98,71 @@ void Display() {//(re)display the changes
         }
         exit(0); // choose to exit
 
-    }
-    else if (selection == 3) {
+    } else if (selection == 3) {
         SaveMap();
-    }
-    else if (selection == 2) {
+    } else if (selection == 2) {
         LoadMap();
-        Display();
-    }
-    else if (selection == 1) {
+        block_display();
+    } else if (selection == 1) {
         ClearMaze();
-        Display();
+        block_display();
     }
     //Edit the map
     selection = menuList(GenUIID(0), x + w, y - h, w, wlist, h, menuListMazeEdit,
-        sizeof(menuListMazeEdit) / sizeof(menuListMazeEdit[0]));
+                         sizeof(menuListMazeEdit) / sizeof(menuListMazeEdit[0]));
     if (selection > 0) selectedLabel = menuListMazeEdit[selection];
     if (selection == 3) {
-        if (lock_change == 1) {
-            ClearMaze();//To DO :the surrounding barriers
-            Display();
+        if (lock_change == 1) {//clear and edit
+            agent.i=1;agent.j=1;
+            play=0;
+            ClearMaze();
+            block_display();
             lock_change = 0;
             lock(lock_change);
-        }
-        else {
+        } else {
             lock_change = 1;
             lock(lock_change);
-            callsolve(agent.i, agent.j);
         }
-    }
-    else if (selection == 1) {//by hand
+    } else if (selection == 1) {//by hand
+        agent.i=1;agent.j=1;
+        play=0;
         if (lock_change == 1) {
             lock_change = 0;
             lock(lock_change);
-        }
-        else {
+        } else {
             lock_change = 1;
             lock(lock_change);
-            callsolve(agent.i, agent.j);
         }
-    }
-    else if (selection == 2) {
+    } else if (selection == 2) {//regenerate
+        agent.i=1;agent.j=1;
+        play=0;
         InitGame();
-        Display();
-        callsolve(agent.i, agent.j);
+        block_display();
         lock_change = 1;
     }
     //Solve
     selection = menuList(GenUIID(0), x + 2 * w, y - h, w, wlist, h, menuListMazeSolve,
-        sizeof(menuListMazeSolve) / sizeof(menuListMazeSolve[0]));
+                         sizeof(menuListMazeSolve) / sizeof(menuListMazeSolve[0]));
     if (selection > 0) selectedLabel = menuListMazeSolve[selection];
     if (selection == 2) {
-        callsolve(agent.i, agent.j);
-        visualize();
+        callsolve(1,1);
+        startTimer(0,500);
+        block_display();
+        Display();
         play = 0;
-    }
-    else if (selection == 1) {
+    } else if (selection == 1) {
         play = 1;
+    } else if (selection == 3){
+        callsolve(1,1);
+        traverse_linkedlist(shortest_index());
     }
     //Help
     selection = menuList(GenUIID(0), x + 3 * w, y - h, w, wlist, h, menuListHelp,
-        sizeof(menuListHelp) / sizeof(menuListHelp[0]));
+                         sizeof(menuListHelp) / sizeof(menuListHelp[0]));
     if (selection > 0) selectedLabel = menuListHelp[selection];
     if (selection == 2) {
         About();
-    }
-    else if (selection == 1) {
+    } else if (selection == 1) {
         Guide();
     }
 
@@ -175,98 +172,122 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
     uiGetKeyboard(key, event);
     int i;
     switch (event) {
-    case KEY_DOWN:
-        switch (key) {
-        case VK_F1:
-            if (lock_change == 1) {
-                ClearMaze();//To DO :the surrounding barriers
-                Display();
-                lock_change = 0;
-                lock(lock_change);
-            }
-            else {
-                lock_change = 1;
-                lock(lock_change);
-                callsolve(agent.i, agent.j);
-            }
-            break;
-        case VK_F2:
-            InitGame();
-            Display();
-            callsolve(agent.i, agent.j);
-            lock_change = 1;
-            break;
-        case VK_F3:    //edit on the existing map
-            if (lock_change == 1) {
-                lock_change = 0;
-                lock(lock_change);
-            }
-            else {
-                lock_change = 1;
-                lock(lock_change);
-            }
-            break;
-        case VK_F4://save map
-            SaveMap();
-            break;
-        case VK_F5://read map
-            LoadMap();
-            Display();
-            break;
-        case VK_F6:
-            Guide();
-            break;
-        case VK_F12://exit
-            i = 1;
-            while (Head[i]) {
-                while (Head[i]) {
-                    struct visits_node* node;
-                    node = Head[i]->next;
-                    free(Head[i]);
-                    Head[i] = node;
-                }
-                i++;
-            }
-            exit(0);
-            break;
-        case VK_UP:
-            if (play == 0)break;
-            if (check(agent.i + 1, agent.j) != 1)
-                agent.i++;
-            Display();
-            break;
-        case VK_DOWN:
-            if (play == 0)break;
-            if (check(agent.i - 1, agent.j) != 1)
-                agent.i--;
-            Display();
-            break;
-        case VK_LEFT:
-            if (play == 0)break;
-            if (check(agent.i, agent.j - 1) != 1)
-                agent.j--;
-            Display();
-            break;
-        case VK_RIGHT:
-            if (play == 0)break;
-            if (check(agent.i, agent.j + 1) != 1)
-                agent.j++;
-            Display();
-            break;
-        case VK_F7:
-            callsolve(agent.i, agent.j);
-            visualize();
-            break;
+        case KEY_DOWN:
+            switch (key) {
+                case VK_F1: //clear and edit
+                    agent.i=1;agent.j=1;
+                    play=0;
+                    if (lock_change == 1) {
+                        ClearMaze();//To DO :the surrounding barriers
+                        Display();
+                        lock_change = 0;
+                        lock(lock_change);
+                    } else {
+                        lock_change = 1;
+                        lock(lock_change);
+                        callsolve(agent.i,agent.j);
+                    }
+                    break;
+                case VK_F2://regenerate
+                    agent.i=1;agent.j=1;
+                    play=0;
+                    InitGame();
+                    Display();
+                    callsolve(agent.i,agent.j);
+                    lock_change = 1;
+                    break;
+                case VK_F3:    //edit on the existing map
+                    agent.i=1;
+                    agent.j=1;
+                    play=0;
+                    if (lock_change == 1) {
+                        lock_change = 0;
+                        lock(lock_change);
+                    } else {
+                        lock_change = 1;
+                        lock(lock_change);
+                    }
+                    break;
+                case VK_F4://save map
+                    SaveMap();
+                    break;
+                case VK_F5://read map
+                    LoadMap();
+                    Display();
+                    break;
+                case VK_F6:
+                    Guide();
+                    break;
+                case VK_F12://exit
+                    i = 1;
+                    while (Head[i]) {
+                        while (Head[i]) {
+                            struct visits_node *node;
+                            node = Head[i]->next;
+                            free(Head[i]);
+                            Head[i] = node;
+                        }
+                        i++;
+                    }
+                    exit(0);
+                    break;
+                case VK_UP:
+                    if (play == 0)break;
+                    if (check(agent.i + 1, agent.j) != 1)
+                        agent.i++;
+                    Display();
+                    break;
+                case VK_DOWN:
+                    if (play == 0)break;
+                    if (check(agent.i - 1, agent.j) != 1)
+                        agent.i--;
+                    Display();
+                    break;
+                case VK_LEFT:
+                    if (play == 0)break;
+                    if (check(agent.i, agent.j - 1) != 1)
+                        agent.j--;
+                    Display();
+                    break;
+                case VK_RIGHT:
+                    if (play == 0)break;
+                    if (check(agent.i, agent.j + 1) != 1)
+                        agent.j++;
+                    Display();
+                    break;
+                case VK_F7:
+                    callsolve(1,1);
+                    startTimer(0,500);
+                    block_display();
+                    Display();
+                    break;
+                case VK_F8:
+                    callsolve(1,1);
+                    traverse_linkedlist(shortest_index());
+                    break;
 
-        }
-        break;
-    case KEY_UP:
-        break;
+
+            }
+            break;
+        case KEY_UP:
+            break;
 
     }
     Display();
 }
-
+void TimerEventProcess(int timerID){
+    static int time=0;
+    if(timerID==0){
+        block_display();
+        traverse_linkedlist(time);
+        Display();
+        time++;
+        if(time>=count){
+            cancelTimer(0);
+            time=0;
+        }
+    }
+}
 void MouseEventProcess(int x, int y, int button, int event) {
     uiGetMouse(x, y, button, event);
     double windowWidth = GetWindowWidth();
@@ -279,8 +300,8 @@ void MouseEventProcess(int x, int y, int button, int event) {
         int curCoordinateI = -1, curCoordinateJ = -1;
         double xx = ScaleXInches(x);
         double yy = ScaleYInches(y);
-        for (i = 0; i < X; i++) {
-            for (j = 0; j < X; j++) {
+        for (i = 1; i < X-1; i++) {
+            for (j = 1; j < X-1; j++) {
                 double pi = i * blockL;
                 double pj = j * blockL;
                 if (xx > pj && xx < pj + blockL && yy > pi && yy < pi + blockL) {
@@ -293,17 +314,12 @@ void MouseEventProcess(int x, int y, int button, int event) {
 
         if (lock_change == 0 && curCoordinateI >= 0 && curCoordinateJ >= 0 &&
             (blockState[curCoordinateI][curCoordinateJ] == VACANT ||
-                blockState[curCoordinateI][curCoordinateJ] == BARRIER)) {
+             blockState[curCoordinateI][curCoordinateJ] == BARRIER)) {
             blockState[curCoordinateI][curCoordinateJ] = 1 - blockState[curCoordinateI][curCoordinateJ];
         }
-
-
-        //		if (curCoordinate < N  && curCoordinate >= 0 && blockState[curCoordinate] == VACANT) {
-        //		 	blockState[curCoordinate] = BARRIER;
-        //		}else if(curCoordinate < N && curCoordinate >= 0 && blockState[curCoordinate] == BARRIER){
-        //		 	blockState[curCoordinate] = VACANT;
-        //		}
     }
+    DisplayClear();
+    block_display();
     Display();
 }
 
@@ -311,10 +327,12 @@ void Main() {
     SetWindowTitle("Maze");
     SetWindowSize(X, X + 2);
     InitGraphics();
-    InitConsole();
+//    InitConsole();
     InitGame();
     registerKeyboardEvent(KeyboardEventProcess);
     registerMouseEvent(MouseEventProcess);
+    registerTimerEvent(TimerEventProcess);
+    block_display();
     Display();
     lock(lock_change);
 

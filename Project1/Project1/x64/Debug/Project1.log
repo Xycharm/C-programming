@@ -1,10 +1,10 @@
 ﻿  block.c
   file.c
   main.c
-C:\Users\Xy191\Desktop\GitHub\C-programming\Project1\Project1\main.c(87,26): warning C4311: “类型强制转换”: 从“char (*)[69]”到“long”的指针截断
-C:\Users\Xy191\Desktop\GitHub\C-programming\Project1\Project1\main.c(116,26): warning C4311: “类型强制转换”: 从“char (*)[69]”到“long”的指针截断
-C:\Users\Xy191\Desktop\GitHub\C-programming\Project1\Project1\main.c(150,26): warning C4311: “类型强制转换”: 从“char (*)[69]”到“long”的指针截断
-C:\Users\Xy191\Desktop\GitHub\C-programming\Project1\Project1\main.c(162,26): warning C4311: “类型强制转换”: 从“char (*)[69]”到“long”的指针截断
+C:\Users\Xy191\Desktop\GitHub\C-programming\Project1\Project1\main.c(85,26): warning C4311: “类型强制转换”: 从“char (*)[69]”到“long”的指针截断
+C:\Users\Xy191\Desktop\GitHub\C-programming\Project1\Project1\main.c(111,26): warning C4311: “类型强制转换”: 从“char (*)[69]”到“long”的指针截断
+C:\Users\Xy191\Desktop\GitHub\C-programming\Project1\Project1\main.c(144,26): warning C4311: “类型强制转换”: 从“char (*)[69]”到“long”的指针截断
+C:\Users\Xy191\Desktop\GitHub\C-programming\Project1\Project1\main.c(160,26): warning C4311: “类型强制转换”: 从“char (*)[69]”到“long”的指针截断
   menu.c
   randomGeneration.c
   solution.c

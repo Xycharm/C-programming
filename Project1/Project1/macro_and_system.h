@@ -24,17 +24,20 @@
 #include "libgraphics\random.h"
 #include <time.h>
 
-#define X 31
-#define NVISIT 99
+#define X 13
 //must be odd
 #define  VACANT  0
 #define BARRIER  1
 #define     RED  2
 #define    DEST  3
 #define   START  4
-extern char* colors[];
+extern char *colors[];
 extern int blockState[X][X];
-
+struct Agent{
+    int i;
+    int j;
+};//extern a structure?????
+extern struct Agent agent;
 void Barrier();
 
 void colorBlock(int color, int x, int y);
@@ -58,6 +61,7 @@ void randomDFS(int i, int j);
 void lock(int lock_change);
 
 void Display();
+void block_display();
 
 #endif // !macro
 
