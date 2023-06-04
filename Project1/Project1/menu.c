@@ -1,6 +1,7 @@
 #include"macro_and_system.h"
 
-void subtitle(char *title) {//draw the subtitle
+void subtitle(char *title)
+{//draw the subtitle
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 
@@ -33,7 +34,8 @@ void subtitle(char *title) {//draw the subtitle
 }
 
 
-void About() {//draw the about page
+void About()
+{//draw the about page
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 
@@ -96,7 +98,8 @@ void About() {//draw the about page
 
 }
 
-void Guide() {//draw the guide page
+void Guide() 
+{//draw the guide page
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 

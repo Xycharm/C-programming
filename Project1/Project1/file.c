@@ -1,6 +1,7 @@
 #include"macro_and_system.h"
 
-void SaveMap() {
+void SaveMap() 
+{
     char filename[2048] = {0};
     if (!SaveFileDialog("graphic file(*.data)\0*.data\0", filename))
         return;
@@ -15,7 +16,8 @@ void SaveMap() {
     fclose(fp);
 }
 
-void LoadMap() {
+void LoadMap() 
+{
     char filename[2048] = {0};
     if (!OpenFileDialog("????(*.data)\0*.data\0", filename))
         return;

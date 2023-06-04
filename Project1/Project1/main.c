@@ -14,7 +14,8 @@ int play = 0;//whether the agent is able to move
 char *colors[] = {"White", "Black", "Red", "Yellow", "Green","Orange"};//store the color strings
 int biplayer;//whether the game is biplayer
 
-void InitGame() {
+void InitGame() 
+{
     //initialize the game, including the map and the agent
     //use randomDFS to generate a random map
     if(biplayer==0)
@@ -34,7 +35,8 @@ void InitGame() {
     agent.j = 1;
 }
 
-void block_display() {
+void block_display()
+{
     //display the blocks
 
 
@@ -52,7 +54,8 @@ void block_display() {
     if(biplayer) colorBlock(ANOTHER, another_agent.i, another_agent.j);
 }
 
-void Display() {
+void Display()
+{
     //redraw the menu bar and realize the function of the menu bar
 
 
@@ -218,7 +221,8 @@ void Display() {
 
 }
 
-void KeyboardEventProcess(int key, int event) {//Keyboard
+void KeyboardEventProcess(int key, int event) 
+{//Keyboard
     win_judge();
     uiGetKeyboard(key, event);
     int i;
@@ -382,7 +386,8 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
     Display();
 }
 
-void TimerEventProcess(int timerID) {//Timer
+void TimerEventProcess(int timerID)
+{//Timer
     static int time = 0;
     if (timerID == 0) {//visualize all the paths
         block_display();
@@ -409,7 +414,8 @@ void TimerEventProcess(int timerID) {//Timer
     }
 }
 
-void MouseEventProcess(int x, int y, int button, int event) {//Mouse
+void MouseEventProcess(int x, int y, int button, int event) 
+{//Mouse
     win_judge();
     uiGetMouse(x, y, button, event);
     double windowWidth = GetWindowWidth();
@@ -445,9 +451,10 @@ void MouseEventProcess(int x, int y, int button, int event) {//Mouse
     Display();
 }
 
-void Main() {
+void Main() 
+{
     SetWindowTitle("Maze");
-    SetWindowSize(X, X + 2);
+    SetWindowSize(X, X + 4);
     InitGraphics();
 //    InitConsole();
     InitGame();

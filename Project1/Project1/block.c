@@ -1,6 +1,7 @@
 #include"macro_and_system.h"
 
-void Barrier() {//Draw the grids
+void Barrier() 
+{//Draw the grids
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight() - 2;
     double blockL = windowWidth / X;
@@ -8,7 +9,7 @@ void Barrier() {//Draw the grids
     SetPenColor("Black");
     for (j = 0; j < X; j++) {
         MovePen(j * blockL, 0);
-        DrawLine(0, windowHeight);
+        DrawLine(0, windowWidth);
     }
     for (j = 0; j < X; j++) {
         MovePen(0, j * blockL);
@@ -16,7 +17,8 @@ void Barrier() {//Draw the grids
     }
 }
 
-void colorBlock(int color, int x, int y) { //Draw the color blocks
+void colorBlock(int color, int x, int y)
+{ //Draw the color blocks
     if (color == VACANT)return;
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight() - 2;
@@ -36,7 +38,8 @@ void colorBlock(int color, int x, int y) { //Draw the color blocks
 
 }
 
-void ClearMaze() {//Clear the maze and Initialize the maze
+void ClearMaze()
+{//Clear the maze and Initialize the maze
     int i, j;
     for (i = 0; i < X; i++) {
         for (j = 0; j < X; j++) {
@@ -58,7 +61,8 @@ void ClearMaze() {//Clear the maze and Initialize the maze
 
 }
 /*draw the 'lock' icon*/
-void lock(int lock_change) {
+void lock(int lock_change)
+{
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
     double fH = GetFontHeight();
@@ -70,7 +74,7 @@ void lock(int lock_change) {
     char *str2 = "unlocked";
     double fontAscent = GetFontAscent();
     double tw = TextStringWidth(str2);
-    double len = tw + 1;
+    double len = tw + 0.7;
 
     if (lock_change) {
         MovePen(x, y - h*2 );
@@ -82,7 +86,7 @@ void lock(int lock_change) {
         DrawLine(-len, 0);
         EndFilledRegion();
 
-        MovePen(len / 2 - tw / 2, y - h * 2.5 - fontAscent / 2);
+        MovePen(len / 2 - tw / 2, y - h * 1.4 - fontAscent / 2);
         SetPenColor("Black");
         DrawTextString(str1);
 
@@ -96,7 +100,7 @@ void lock(int lock_change) {
         DrawLine(-len, 0);
         EndFilledRegion();
 
-        MovePen(len / 2 - tw / 2, y - h * 2.5 - fontAscent / 2);
+        MovePen(len / 2 - tw / 2, y - h * 1.4 - fontAscent / 2);
         SetPenColor("Black");
         DrawTextString(str2);
     }

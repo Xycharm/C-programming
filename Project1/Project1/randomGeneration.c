@@ -1,6 +1,7 @@
 #include"macro_and_system.h"
 
-int check(int i, int j) {
+int check(int i, int j) 
+{
     //used while generating the maze,check whether a block is feasible to be a path when generating the maze
     if (i < 0 || i >= X || j < 0 || j >= X)return 0;
     if (blockState[i][j] == VACANT)return 0;
@@ -8,7 +9,8 @@ int check(int i, int j) {
     return -1;
 }
 
-int direction_feasible(int i, int j) {
+int direction_feasible(int i, int j) 
+{
     //judge whether a block is feasible to have a direction path when generating the maze
     int k = 0;
     for (k = 0; k < 4; k++) {
@@ -30,7 +32,8 @@ int direction_feasible(int i, int j) {
     return -1;
 }
 
-int direction_judge(int i, int j, int dir) {
+int direction_judge(int i, int j, int dir)
+{
     //judge whether a direction is feasible when generating the maze
     switch (dir) {
         case 0:
@@ -49,7 +52,8 @@ int direction_judge(int i, int j, int dir) {
     return -1;
 }
 
-void randomDFS(int i, int j) {
+void randomDFS(int i, int j)
+{
     //randomly generate the maze
     if (direction_feasible(i, j) == -1) return;
     int rand_way = rand() % 4;
