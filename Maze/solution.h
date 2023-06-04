@@ -1,6 +1,6 @@
 #ifndef solution
 #define solution
-#define N_list 9 //capacity of nodes[]
+#define N_list 999 //capacity of nodes[]
 typedef struct visits_node {
     int i;
     int j;

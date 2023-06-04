@@ -22,15 +22,44 @@ Node *add_node(Node *head, int i, int j) {
 
 void win_judge() {
     //judge whether the agent wins
-    if (agent.i == X - 2 && agent.j == X - 2) {
-        subtitle("win!win!win!!!\nnew game will be started");
-        agent.i = 1;
-        agent.j = 1;
-        play = 0;
-        InitGame();
-        Display();
-        lock_change = 1;
+    if(biplayer==1){
+        if(agent.i==X-2&&agent.j==X-2){
+            biplayer=0;
+            subtitle("red win!win!win!!!\nnew game will be started");
+            agent.i=1;
+            agent.j=1;
+            another_agent.i=1;
+            another_agent.j=1;
+            biplayer=1;
+            play=1;
+            InitGame();
+            Display();
+            lock_change=1;
+        } else if(another_agent.i==X-2&&another_agent.j==X-2){
+            play=0;
+            subtitle("blue win!win!win!!!\nnew game will be started");
+            agent.i=1;
+            agent.j=1;
+            another_agent.i=1;
+            another_agent.j=1;
+            play=1;
+            InitGame();
+            Display();
+            lock_change=1;
+        }
+
+    }else{
+        if (agent.i == X - 2 && agent.j == X - 2) {
+            subtitle("win!win!win!!!\nnew game will be started");
+            agent.i = 1;
+            agent.j = 1;
+            play = 0;
+            InitGame();
+            Display();
+            lock_change = 1;
+        }
     }
+
 }
 
 void print_linkedlist() {
@@ -170,6 +199,9 @@ void linklist_length(Node *head) {
 
 
 void solve(int i, int j) {
+    if (count>=N_list){
+        return;
+    }
     //solve the maze with recursion
     path = add_node(path, i, j);
     visit[i][j] = 1;
@@ -177,6 +209,10 @@ void solve(int i, int j) {
     if (i == X - 2 && j == X - 2 && count < N_list) {
         linklist_length(nodes[count]);
         count++;
+        if (count>=N_list){
+            visit[i][j] = 0;
+            return;
+        }
         nodes[count] = copy_linkedlist(nodes[count - 1], nodes[count]);
     }
     int di[] = {0, 0, 1, -1};
@@ -187,6 +223,10 @@ void solve(int i, int j) {
         int _j = j + dj[k];
         if ((blockState[_i][_j] == VACANT || blockState[_i][_j] == DEST) && visit[_i][_j] == 0) {
             solve(_i, _j);
+            if (count>=N_list){
+                visit[i][j] = 0;
+                return;
+            }
         }
     }
     visit[i][j] = 0;

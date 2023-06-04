@@ -8,16 +8,17 @@ Node *path;//store the linked list of nodes as the path of exploration
 int lengths[N_list];//store the lengths of paths
 int count;//the number of paths
 struct Agent agent = {1, 1};//the position of agent
+struct Agent another_agent = {1, 1};//the position of another agent
 int lock_change = 1;//whether being able to change the map
 int play = 0;//whether the agent is able to move
-char *colors[] = {"White", "Black", "Red", "Yellow", "Green"};//store the color strings
-
+char *colors[] = {"White", "Black", "Red", "Yellow", "Green","Orange"};//store the color strings
+int biplayer;//whether the game is biplayer
 
 void InitGame() {
     //initialize the game, including the map and the agent
     //use randomDFS to generate a random map
-
-    play = 0;
+    if(biplayer==0)
+    {play = 0;}
     srand((unsigned) time(NULL));
     int i, j;
     for (i = 0; i < X; i++) {
@@ -48,6 +49,7 @@ void block_display() {
     }
 
     colorBlock(RED, agent.i, agent.j);
+    if(biplayer) colorBlock(ANOTHER, another_agent.i, another_agent.j);
 }
 
 void Display() {
@@ -69,7 +71,8 @@ void Display() {
                                         "Automatically | Ctrl-VK_F7",
                                         "Optimal | Ctrl-VK_F8",
                                         "Single Step | Ctrl-VK_F9",
-                                        "Explore paths | Ctrl-VK_F10"};
+                                        "Explore paths | E",
+                                        "Biplayer | B"};
     static char *menuListHelp[] = {"Help",
                                    "How to play",
                                    "About"};
@@ -132,6 +135,8 @@ void Display() {
             lock_change = 1;
             lock(lock_change);
         }
+        block_display();
+        Display();
     } else if (selection == 1) {//by hand
         agent.i = 1;
         agent.j = 1;
@@ -143,12 +148,15 @@ void Display() {
             lock_change = 1;
             lock(lock_change);
         }
+        block_display();
+        Display();
     } else if (selection == 2) {//regenerate
         agent.i = 1;
         agent.j = 1;
         play = 0;
         InitGame();
         block_display();
+        Display();
         lock_change = 1;
     }
 
@@ -169,7 +177,10 @@ void Display() {
             play = 1;
         } else if (selection == 3) {//optimal
             callsolve(agent.i, agent.j);
+            block_display();
+            Display();
             traverse_linkedlist(shortest_index());
+
         } else if (selection == 4) {//single step
             callsolve(agent.i, agent.j);
             if (nodes[shortest_index()]->next != NULL) {
@@ -182,6 +193,13 @@ void Display() {
         } else if (selection == 5) {//explore
             callsolve(agent.i, agent.j);
             path_();
+        } else if (selection == 6) {//biplayer
+            agent.j = 1;
+            agent.i = 1;
+            another_agent.i = 1;
+            another_agent.j = 1;
+            if(play==0)play=1;
+            biplayer= 1-biplayer;
         }
 
 
@@ -284,6 +302,42 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     block_display();
                     Display();
                     break;
+                case 'B':
+                    agent.j = 1;
+                    agent.i = 1;
+                    another_agent.i = 1;
+                    another_agent.j = 1;
+                    if(play==0)play=1;
+                    biplayer= 1-biplayer;
+                    break;
+                case 'W':
+                    if (biplayer == 0)break;
+                    if (check(another_agent.i + 1, another_agent.j) != 1)
+                        another_agent.i++;
+                    block_display();
+                    Display();
+                    break;
+                case 'A':
+                    if (biplayer == 0)break;
+                    if (check(another_agent.i, another_agent.j - 1) != 1)
+                        another_agent.j--;
+                    block_display();
+                    Display();
+                    break;
+                case 'S':
+                    if (biplayer == 0)break;
+                    if (check(another_agent.i - 1, another_agent.j) != 1)
+                        another_agent.i--;
+                    block_display();
+                    Display();
+                    break;
+                case 'D':
+                    if (biplayer == 0)break;
+                    if (check(another_agent.i, another_agent.j + 1) != 1)
+                        another_agent.j++;
+                    block_display();
+                    Display();
+                    break;
                 case VK_F7://auto
                     if (lock_change == 1) {
                         callsolve(agent.i, agent.j);
@@ -312,7 +366,7 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     block_display();
                     Display();
                     break;
-                case 'S'://explore
+                case 'E'://explore
                     if (lock_change == 1) {
                         callsolve(agent.i, agent.j);
                         path_();
