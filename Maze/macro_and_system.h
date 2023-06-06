@@ -24,7 +24,7 @@
 #include "libgraphics\random.h"
 #include <time.h>
 
-#define X 11 //number of blocks in a row/column
+#define X 23 //number of blocks in a row/column
 //must be odd
 //define the state(color) of a block
 #define  VACANT  0
@@ -32,7 +32,8 @@
 #define     RED  2
 #define    DEST  3
 #define   START  4
-#define ANOTHER 5
+#define ANOTHER  5
+//#define Epoch 99
 extern int biplayer;
 extern char *colors[];
 extern int blockState[X][X];

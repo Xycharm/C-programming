@@ -1,6 +1,7 @@
 #include"macro_and_system.h"
 #include"solution.h"
 
+int rein_visit[X][X];//record whether a block has been visited when generating the maze
 int blockState[X][X];//record the states of blocks
 int visit[X][X];//record whether a block has been visited
 Node *nodes[N_list] = {NULL};//store the linked list of nodes as paths that arrive at the destination
@@ -11,14 +12,13 @@ struct Agent agent = {1, 1};//the position of agent
 struct Agent another_agent = {1, 1};//the position of another agent
 int lock_change = 1;//whether being able to change the map
 int play = 0;//whether the agent is able to move
-char *colors[] = {"White", "Black", "Red", "Yellow", "Green","Orange"};//store the color strings
+char *colors[] = {"White", "Black", "Red", "Yellow", "Green", "Orange"};//store the color strings
 int biplayer;//whether the game is biplayer
 
 void InitGame() {
     //initialize the game, including the map and the agent
     //use randomDFS to generate a random map
-    if(biplayer==0)
-    {play = 0;}
+    if (biplayer == 0) { play = 0; }
     srand((unsigned) time(NULL));
     int i, j;
     for (i = 0; i < X; i++) {
@@ -49,7 +49,7 @@ void block_display() {
     }
 
     colorBlock(RED, agent.i, agent.j);
-    if(biplayer) colorBlock(ANOTHER, another_agent.i, another_agent.j);
+    if (biplayer) colorBlock(ANOTHER, another_agent.i, another_agent.j);
 }
 
 void Display() {
@@ -59,20 +59,21 @@ void Display() {
     //menu list
     static char *menuListFile[] = {"File",
                                    "New",
-                                   "Open | Ctrl-VK_F5",
-                                   "Save | Ctrl-VK_F4",
-                                   "Exit | Ctrl-VK_F12"};
+                                   "Open | F5",
+                                   "Save | F4",
+                                   "Exit | F12"};
     static char *menuListMazeEdit[] = {"Edit the map",
-                                       "Edit manually | Ctrl-VK_F3",
-                                       "Regenerate | Ctrl-VK_F2",
-                                       "Clear and edit | Ctrl-VK_F1"};
+                                       "Edit manually | F3",
+                                       "Regenerate | F2",
+                                       "Clear and edit | F1"};
     static char *menuListMazeSolve[] = {"Solve",
-                                        "Manually",
-                                        "Automatically | Ctrl-VK_F7",
-                                        "Optimal | Ctrl-VK_F8",
-                                        "Single Step | Ctrl-VK_F9",
+                                        "Manually | M",
+                                        "Automatically | F7",
+                                        "Optimal | F8",
+                                        "Single Step/Hint | F9",
                                         "Explore paths | E",
-                                        "Biplayer | B"};
+                                        "Biplayer | B",
+                                        "Reinforcement learning | R"};
     static char *menuListHelp[] = {"Help",
                                    "How to play",
                                    "About"};
@@ -198,8 +199,10 @@ void Display() {
             agent.i = 1;
             another_agent.i = 1;
             another_agent.j = 1;
-            if(play==0)play=1;
-            biplayer= 1-biplayer;
+            if (play == 0)play = 1;
+            biplayer = 1 - biplayer;
+        }else if(selection==7){
+            Q_learning();
         }
 
 
@@ -307,8 +310,8 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     agent.i = 1;
                     another_agent.i = 1;
                     another_agent.j = 1;
-                    if(play==0)play=1;
-                    biplayer= 1-biplayer;
+                    if (play == 0)play = 1;
+                    biplayer = 1 - biplayer;
                     break;
                 case 'W':
                     if (biplayer == 0)break;
@@ -347,6 +350,9 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                     }
 
                     break;
+                case 'M':
+                    play=1;
+                    break;
                 case VK_F8://optimal
                     if (lock_change == 1) {
                         callsolve(agent.i, agent.j);
@@ -372,6 +378,9 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
                         path_();
                         break;
                     }
+                case 'R'://reinforcement learning
+                    Q_learning();
+                    break;
 
             }
             break;
@@ -384,6 +393,7 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
 
 void TimerEventProcess(int timerID) {//Timer
     static int time = 0;
+    static int epoch = 0;
     if (timerID == 0) {//visualize all the paths
         block_display();
         traverse_linkedlist(time);
@@ -405,6 +415,49 @@ void TimerEventProcess(int timerID) {//Timer
 
         printf("end\n");
         Display();
+
+    }
+    if (timerID == -2) {
+
+        int previ = agent.i;
+        int prevj = agent.j;
+        rein_visit[agent.i][agent.j] += 1;
+        int action = EpsilonGreedy(agent.i, agent.j, epsilon);
+        printf("(%d,%d)", agent.i, agent.j);
+        agent_move[action]();
+        Q[previ][prevj][action] = Q[previ][prevj][action] + alpha * (reward(previ, prevj, action) +
+                                                                     gamma * maxQ(agent.i, agent.j) -
+                                                                     Q[previ][prevj][action]);
+
+        if (agent.i == X - 2 && agent.j == X - 2) {
+            epoch++;
+            for (int i = 0; i < X; i++) {
+                for (int j = 0; j < X; j++) {
+                    rein_visit[i][j] = 0;
+                }
+            }
+            agent.i = 1;
+            agent.j = 1;
+            printf("epoch:%d\n", epoch);
+//            epsilon = epsilon * DECAY;
+            if (epoch == EPOCH - 3) {
+                epsilon = 0;
+            }
+        }
+
+        if (epoch == EPOCH) {
+            //clear rein_visit
+
+            for (int i = 0; i < X; i++) {
+                for (int j = 0; j < X; j++) {
+                    rein_visit[i][j] = 0;
+                }
+            }
+            agent.i = 1;
+            agent.j = 1;
+            cancelTimer(-2);
+            epoch = 0;
+        }
 
     }
 }
@@ -447,7 +500,7 @@ void MouseEventProcess(int x, int y, int button, int event) {//Mouse
 
 void Main() {
     SetWindowTitle("Maze");
-    SetWindowSize(X, X + 2);
+    SetWindowSize(X, X + 4);
     InitGraphics();
 //    InitConsole();
     InitGame();

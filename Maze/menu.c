@@ -1,6 +1,7 @@
 #include"macro_and_system.h"
 
-void subtitle(char *title) {//draw the subtitle
+void subtitle(char *title)
+{//draw the subtitle
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 
@@ -33,7 +34,8 @@ void subtitle(char *title) {//draw the subtitle
 }
 
 
-void About() {//draw the about page
+void About()
+{//draw the about page
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 
@@ -96,7 +98,8 @@ void About() {//draw the about page
 
 }
 
-void Guide() {//draw the guide page
+void Guide() 
+{//draw the guide page
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();
 
@@ -121,7 +124,7 @@ void Guide() {//draw the guide page
     DrawLine(-len, 0);
 
     char *str1 = "HOW TO PLAY";
-    char *str2 = "  clear the map and biuld your own: F1 / Edit the map->Regenerate";
+    char *str2 = "  clear the map and build your own: F1 / Edit the map->Regenerate";
     char *str3 = "  Regenerate a map: F2 / Edit the map->Clear and edit";
     char *str4 = "  Edit the map: F3 / Edit the map->Edit manually";
     char *str8 = "  (touch F3/Edit manually again to lock the map)";
