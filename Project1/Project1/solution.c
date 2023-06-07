@@ -24,30 +24,30 @@ Node *add_node(Node *head, int i, int j)
 void win_judge()
 {
     //judge whether the agent wins
-    if(biplayer==1){
-        if(agent.i==X-2&&agent.j==X-2){
-            biplayer=0;
+    if(biplayer == 1){
+        if(agent.i == X - 2 && agent.j == X - 2){
+            biplayer = 0;
             subtitle("red win!win!win!!!\nnew game will be started");
-            agent.i=1;
-            agent.j=1;
-            another_agent.i=1;
-            another_agent.j=1;
-            biplayer=1;
-            play=1;
+            agent.i = 1;
+            agent.j = 1;
+            another_agent.i = 1;
+            another_agent.j = 1;
+            biplayer = 1;
+            play = 1;
             InitGame();
             Display();
-            lock_change=1;
-        } else if(another_agent.i==X-2&&another_agent.j==X-2){
-            play=0;
+            lock_change = 1;
+        } else if(another_agent.i == X-2 && another_agent.j == X - 2){
+            play = 0;
             subtitle("blue win!win!win!!!\nnew game will be started");
-            agent.i=1;
-            agent.j=1;
-            another_agent.i=1;
-            another_agent.j=1;
-            play=1;
+            agent.i = 1;
+            agent.j = 1;
+            another_agent.i = 1;
+            another_agent.j = 1;
+            play = 1;
             InitGame();
             Display();
-            lock_change=1;
+            lock_change = 1;
         }
 
     }else{

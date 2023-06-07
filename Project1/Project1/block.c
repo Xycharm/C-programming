@@ -1,7 +1,7 @@
 #include"macro_and_system.h"
 
-void Barrier() 
-{//Draw the grids
+void Barrier() //Draw the grids
+{
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight() - 2;
     double blockL = windowWidth / X;
@@ -17,8 +17,8 @@ void Barrier()
     }
 }
 
-void colorBlock(int color, int x, int y)
-{ //Draw the color blocks
+void colorBlock(int color, int x, int y)//Draw the color blocks
+{ 
     if (color == VACANT)return;
     double windowWidth = GetWindowWidth();
     double windowHeight = GetWindowHeight() - 2;
@@ -38,8 +38,8 @@ void colorBlock(int color, int x, int y)
 
 }
 
-void ClearMaze()
-{//Clear the maze and Initialize the maze
+void ClearMaze()//Clear the maze and Initialize the maze
+{
     int i, j;
     for (i = 0; i < X; i++) {
         for (j = 0; j < X; j++) {
@@ -60,8 +60,8 @@ void ClearMaze()
 
 
 }
-/*draw the 'lock' icon*/
-void lock(int lock_change)
+
+void lock(int lock_change)//draw the 'lock' icon
 {
     double ww = GetWindowWidth();
     double wh = GetWindowHeight();

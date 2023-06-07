@@ -13,9 +13,11 @@ struct Agent another_agent = {1, 1};//the position of another agent
 int lock_change = 1;//whether being able to change the map
 int play = 0;//whether the agent is able to move
 char *colors[] = {"White", "Black", "Red", "Yellow", "Green", "Orange"};//store the color strings
-int biplayer;//whether the game is biplayer
+int biplayer;//whether the game is Multiplayer
 
-void InitGame() {
+
+void InitGame() 
+{
     //initialize the game, including the map and the agent
     //use randomDFS to generate a random map
     if (biplayer == 0) { play = 0; }
@@ -34,9 +36,9 @@ void InitGame() {
     agent.j = 1;
 }
 
-void block_display() {
+void block_display()
+{
     //display the blocks
-
 
     DisplayClear();
     lock(lock_change);//show the lock icon
@@ -52,28 +54,30 @@ void block_display() {
     if (biplayer) colorBlock(ANOTHER, another_agent.i, another_agent.j);
 }
 
-void Display() {
+void Display() 
+{
     //redraw the menu bar and realize the function of the menu bar
+
 
 
     //menu list
     static char *menuListFile[] = {"File",
                                    "New",
-                                   "Open | F5",
-                                   "Save | F4",
-                                   "Exit | F12"};
+                                   "Open | Ctrl-VK_F5",
+                                   "Save | Ctrl-VK_F4",
+                                   "Exit | Ctrl-VK_F12" };
     static char *menuListMazeEdit[] = {"Edit the map",
-                                       "Edit manually | F3",
-                                       "Regenerate | F2",
-                                       "Clear and edit | F1"};
+                                       "Edit manually | Ctrl-VK_F3",
+                                       "Regenerate | Ctrl-VK_F2",
+                                       "Clear and edit | Ctrl-VK_F1" };
     static char *menuListMazeSolve[] = {"Solve",
-                                        "Manually | M",
-                                        "Automatically | F7",
-                                        "Optimal | F8",
-                                        "Single Step/Hint | F9",
-                                        "Explore paths | E",
-                                        "Biplayer | B",
-                                        "Reinforcement learning | R"};
+                                        "Manually | Ctrl-VK_M",
+                                        "Automatically | Ctrl-VK_F7",
+                                        "Optimal | Ctrl-VK_F8",
+                                        "Single Step/Hint | Ctrl-VK_F9",
+                                        "Explore paths | Ctrl-VK_E",
+                                        "Multiplayer | Ctrl-VK_B",
+                                        "Reinforcement learning | Ctrl-VK_R"};
     static char *menuListHelp[] = {"Help",
                                    "How to play",
                                    "About"};
@@ -194,7 +198,7 @@ void Display() {
         } else if (selection == 5) {//explore
             callsolve(agent.i, agent.j);
             path_();
-        } else if (selection == 6) {//biplayer
+        } else if (selection == 6) {//Multiplayer
             agent.j = 1;
             agent.i = 1;
             another_agent.i = 1;
@@ -221,7 +225,8 @@ void Display() {
 
 }
 
-void KeyboardEventProcess(int key, int event) {//Keyboard
+void KeyboardEventProcess(int key, int event) //Keyboard
+{
     win_judge();
     uiGetKeyboard(key, event);
     int i;
@@ -391,7 +396,8 @@ void KeyboardEventProcess(int key, int event) {//Keyboard
     Display();
 }
 
-void TimerEventProcess(int timerID) {//Timer
+void TimerEventProcess(int timerID) //Timer
+{
     static int time = 0;
     static int epoch = 0;
     if (timerID == 0) {//visualize all the paths
@@ -462,7 +468,8 @@ void TimerEventProcess(int timerID) {//Timer
     }
 }
 
-void MouseEventProcess(int x, int y, int button, int event) {//Mouse
+void MouseEventProcess(int x, int y, int button, int event) //Mouse
+{
     win_judge();
     uiGetMouse(x, y, button, event);
     double windowWidth = GetWindowWidth();
@@ -498,7 +505,8 @@ void MouseEventProcess(int x, int y, int button, int event) {//Mouse
     Display();
 }
 
-void Main() {
+void Main() 
+{
     SetWindowTitle("Maze");
     SetWindowSize(X, X + 4);
     InitGraphics();

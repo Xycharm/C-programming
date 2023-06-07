@@ -1,7 +1,9 @@
 ﻿  main.c
-D:\c语言\C-programming\Project1\Project1\main.c(99,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
-D:\c语言\C-programming\Project1\Project1\main.c(123,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
-D:\c语言\C-programming\Project1\Project1\main.c(167,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
-D:\c语言\C-programming\Project1\Project1\main.c(213,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
-D:\c语言\C-programming\Project1\Project1\main.c(227,9): warning C4101: “i”: 未引用的局部变量
+D:\c语言\C-programming\Project1\Project1\main.c(103,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
+D:\c语言\C-programming\Project1\Project1\main.c(127,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
+D:\c语言\C-programming\Project1\Project1\main.c(171,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
+D:\c语言\C-programming\Project1\Project1\main.c(217,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
+D:\c语言\C-programming\Project1\Project1\main.c(232,9): warning C4101: “i”: 未引用的局部变量
+  menu.c
+  正在生成代码...
   Project1.vcxproj -> D:\c语言\C-programming\Project1\x64\Debug\Project1.exe

@@ -1,8 +1,9 @@
 #ifndef solution
 #define solution
 #define N_list 999 //capacity of nodes[]
-#define EPOCH 99
-#define DECAY 0.8
+#define EPOCH   99
+#define DECAY  0.8
+
 extern double epsilon;
 extern double alpha;
 extern double gamma;
@@ -25,6 +26,7 @@ extern Node *reinforce;
 extern void (*agent_move[4])();
 extern double Q[X][X][4];
 extern int rein_visit[X][X];
+
 int EpsilonGreedy(int i,int j,double epsilon);
 double reward(int i,int j,int action);
 double maxQ(int i,int j);
