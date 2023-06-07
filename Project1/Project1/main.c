@@ -86,7 +86,7 @@ void Display() {
     double y = wh;
     double h = fH * 1.5; // controler height
     double w = ww / 4; // controler width
-    double wlist = TextStringWidth(menuListMazeEdit[1]) * 1.2;
+    double wlist = TextStringWidth(menuListMazeSolve[7]) * 1.2;
     double xindent = wh / 20;
     int selection;
     bool enable_rotation = 1;
