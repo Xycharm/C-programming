@@ -95,14 +95,14 @@ void mySetPenColor(char *color)
  *  DefineColor("Black", 0, 0, 0);
  *  DefineColor("Dark Gray", .35, .35, .35);
  *  DefineColor("Gray", .6, .6, .6);
- *  DefineColor("Light Gray", .8, .75, .75);
+ *  DefineColor("Light Gray", 1, .97, .82);
  *  DefineColor("White", 1, 1, 1);
  *  DefineColor("Brown", .35, .20, .05);
  *  DefineColor("Red", 1, 0, 0);
  *  DefineColor("Orange", 1, .40, .1);
  *  DefineColor("Yellow", 1, 1, 0);
  *  DefineColor("Green", 0, 1, 0);
- *  DefineColor("Blue", 0, 0, 1);
+ *  DefineColor("Blue", .53, .8, .92);
  *  DefineColor("Violet", .93, .5, .93);
  *  DefineColor("Magenta", 1, 0, 1);
  *  DefineColor("Cyan", 0, 1, 1);

@@ -1,9 +1,18 @@
-﻿  main.c
-D:\c语言\C-programming\Project1\Project1\main.c(103,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
-D:\c语言\C-programming\Project1\Project1\main.c(127,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
-D:\c语言\C-programming\Project1\Project1\main.c(171,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
-D:\c语言\C-programming\Project1\Project1\main.c(217,26): warning C4311: “类型强制转换”: 从“char (*)[48]”到“long”的指针截断
-D:\c语言\C-programming\Project1\Project1\main.c(232,9): warning C4101: “i”: 未引用的局部变量
-  menu.c
+﻿  block.c
+  graphics.c
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(741,36): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(758,36): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(880,43): warning C4133: “=”: 从“LONG (__cdecl *)(HWND,UINT,WPARAM,LPARAM)”到“WNDPROC”的类型不兼容
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(836,18): warning C4101: “consoleRect”: 未引用的局部变量
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1063,42): warning C4133: “=”: 从“LONG (__cdecl *)(HWND,UINT,WPARAM,LPARAM)”到“WNDPROC”的类型不兼容
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1175,16): warning C4244: “函数”: 从“WPARAM”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1182,20): warning C4244: “return”: 从“LRESULT”转换到“LONG”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1392,50): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1393,54): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1394,52): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1532,79): warning C4267: “函数”: 从“size_t”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1725,41): warning C4267: “函数”: 从“size_t”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(1780,49): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+D:\c语言\C-programming\Project1\Project1\libgraphics\graphics.c(2069,20): warning C4244: “return”: 从“WPARAM”转换到“int”，可能丢失数据
   正在生成代码...
   Project1.vcxproj -> D:\c语言\C-programming\Project1\x64\Debug\Project1.exe
